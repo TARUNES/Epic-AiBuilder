@@ -1,5 +1,5 @@
-﻿# Project Aegis 🛡️
-### Two-Phase Climate Disaster & Post-Flood Epidemic Intelligence Network
+﻿# EPIC-Hour ⚡
+### Epidemic Prediction & Immediate Crisis Hour
 
 [![Google AI Builder Cup](https://img.shields.io/badge/Google%20AI%20Builder%20Cup-2026-4285F4?logo=google)](https://googleaibuilder.com)
 [![Track](https://img.shields.io/badge/Track-Sustainability%20%26%20Social%20Impact-34A853)](.)
@@ -20,7 +20,7 @@ Climate disasters kill in two phases — and no existing tool spans both:
 | **Wave 1** | Hours 0–48 | Rescue chaos, multilingual SOS floods, duplicate dispatches, missed medical emergencies | Apps stop when water recedes |
 | **Wave 2** | Days 3–14 | Cholera, leptospirosis, dengue erupt silently as sewage contaminates water lines | Hospitals detect outbreaks 10 days too late |
 
-**Aegis bridges both waves in a single causal intelligence pipeline.**
+**EPIC-Hour bridges both waves in a single causal intelligence pipeline.**
 
 ---
 
@@ -160,14 +160,14 @@ Climate disasters kill in two phases — and no existing tool spans both:
 ## Project Structure
 
 ```
-aegis/
+epic-hour/
 ├── frontend/                    # React 19 + Vite
 │   └── src/
 │       ├── components/
 │       │   ├── TimeHorizonSlider.jsx
 │       │   ├── MultimodalIngestDrawer.jsx
 │       │   ├── EpidemicReasoningCard.jsx
-│       │   └── AegisMap.jsx
+│       │   └── EpicHourMap.jsx
 │       ├── hooks/
 │       │   └── useMediaRecorder.js
 │       └── App.jsx
@@ -227,7 +227,7 @@ curl -X POST http://localhost:8000/api/v1/demo/simulate-day -H "Content-Type: ap
 
 ## What Makes This Different
 
-| Capability | What Exists Today | Aegis Advantage |
+| Capability | What Exists Today | EPIC-Hour Advantage |
 |---|---|---|
 | **Hazard-to-Pathogen Memory** | SOS apps archive data after rescue | Phase 1 `environmental_hazard_logged` seeds Phase 2 risk maps |
 | **Vernacular Micro-Pulse Surveillance** | Requires ERP pharmacy integration | 10-second voice note → structured epidemiological telemetry |
@@ -237,7 +237,7 @@ curl -X POST http://localhost:8000/api/v1/demo/simulate-day -H "Content-Type: ap
 
 ## Google AI Builder Cup Alignment
 
-| Criterion | Aegis Delivery |
+| Criterion | EPIC-Hour Delivery |
 |---|---|
 | **Strengthening Resilience** | Real-time volunteer dispatch cuts rescue bottlenecks in Wave 1 |
 | **Supporting Communities** | Vernacular voice input — any literacy level, any regional language |
@@ -248,4 +248,5 @@ curl -X POST http://localhost:8000/api/v1/demo/simulate-day -H "Content-Type: ap
 
 ## License
 
-MIT © 2026 Project Aegis Team
+MIT © 2026 EPIC-Hour Team
+

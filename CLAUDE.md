@@ -1,7 +1,7 @@
-﻿# CLAUDE.md — Project Aegis
+﻿# CLAUDE.md — EPIC-Hour
 
 ## Project Context
-Project Aegis is a **two-phase crisis lifecycle platform** for the Google AI Builder Cup (Sustainability & Social Impact track). It connects real-time disaster SOS triage (Phase 1, Hours 0–48) with post-disaster epidemic early warning (Phase 2, Days 3–14) — a pipeline no existing tool implements.
+EPIC-Hour is a **two-phase crisis lifecycle platform** for the Google AI Builder Cup (Sustainability & Social Impact track). It connects real-time disaster SOS triage (Phase 1, Hours 0–48) with post-disaster epidemic early warning (Phase 2, Days 3–14) — a pipeline no existing tool implements.
 
 ---
 
@@ -36,13 +36,13 @@ Project Aegis is a **two-phase crisis lifecycle platform** for the Google AI Bui
 ## Project Structure
 
 ```
-aegis/
+epic-hour/
 ├── frontend/src/
 │   ├── components/
 │   │   ├── TimeHorizonSlider.jsx     # Phase 1 ↔ Phase 2 toggle + map animation
 │   │   ├── MultimodalIngestDrawer.jsx # MediaRecorder + text paste + dedup badge
 │   │   ├── EpidemicReasoningCard.jsx  # Causal chain display from Gemini Pro
-│   │   └── AegisMap.jsx              # deck.gl pins + HeatmapLayer
+│   │   └── EpicHourMap.jsx              # deck.gl pins + HeatmapLayer
 │   └── hooks/useMediaRecorder.js
 │
 ├── backend/
@@ -146,7 +146,7 @@ GOOGLE_MAPS_API_KEY=             # Maps JS API + Geocoding API enabled
 FIREBASE_PROJECT_ID=
 FIREBASE_PRIVATE_KEY=
 FIREBASE_CLIENT_EMAIL=
-CORS_ORIGINS=http://localhost:5173,https://aegis.web.app
+CORS_ORIGINS=http://localhost:5173,https://epic-hour.web.app
 ```
 
 Frontend (Vite):
@@ -240,3 +240,4 @@ Your task:
 - Offline mobile app — out of scope, browser-first only
 - Multi-city scaling infrastructure — MVP targets single urban ward cluster
 - Payment / volunteer compensation flows
+
