@@ -1,0 +1,853 @@
+{
+  "ward_info": {
+    "ward_id": "WARD_14",
+    "name": "Velachery, Greater Chennai Corporation",
+    "center": {
+      "lat": 12.9775,
+      "lng": 80.2212
+    },
+    "population": 115000,
+    "primary_water_body": "Velachery Lake & Buckingham Canal Outflow",
+    "flood_risk_level": "VERY_HIGH"
+  },
+  "verified_facilities": [
+    {
+      "facility_id": "PHARM-MEDPLUS-01",
+      "facility_name": "MedPlus Pharmacy - Velachery Main Rd",
+      "facility_type": "PHARMACY",
+      "license_token": "PHARM-LIC-VERIFIED-VLC-01",
+      "verified": true,
+      "location": {
+        "lat": 12.9765,
+        "lng": 80.2215,
+        "ward_id": "WARD_14",
+        "address": "No. 42, Velachery Main Road, Near Vijayanagar Bus Stand"
+      },
+      "contact_person": "R. Selvakumar (Lead Pharmacist)"
+    },
+    {
+      "facility_id": "PHARM-APOLLO-02",
+      "facility_name": "Apollo Pharmacy - Bypass Junction",
+      "facility_type": "PHARMACY",
+      "license_token": "PHARM-LIC-VERIFIED-VLC-02",
+      "verified": true,
+      "location": {
+        "lat": 12.9792,
+        "lng": 80.2241,
+        "ward_id": "WARD_14",
+        "address": "Shop 3, Velachery Bypass Road, Ward 14"
+      },
+      "contact_person": "S. Deepa (Registered Chemist)"
+    },
+    {
+      "facility_id": "PHARM-JANAUSHADHI-03",
+      "facility_name": "Pradhan Mantri Jan Aushadhi Kendra - Taramani Link",
+      "facility_type": "PHARMACY",
+      "license_token": "PHARM-LIC-VERIFIED-VLC-03",
+      "verified": true,
+      "location": {
+        "lat": 12.9741,
+        "lng": 80.2268,
+        "ward_id": "WARD_14",
+        "address": "15/B Taramani Link Road, Velachery"
+      },
+      "contact_person": "M. Manikandan (Store Officer)"
+    },
+    {
+      "facility_id": "CLINIC-VELACHERY-04",
+      "facility_name": "Velachery Urban Primary Health Centre (UPHC)",
+      "facility_type": "UPHC",
+      "license_token": "PHARM-LIC-VERIFIED-VLC-04",
+      "verified": true,
+      "location": {
+        "lat": 12.9752,
+        "lng": 80.2185,
+        "ward_id": "WARD_14",
+        "address": "GCC Community Health Complex, 4th Main Road"
+      },
+      "contact_person": "Dr. Kavitha Raman (Medical Officer)"
+    },
+    {
+      "facility_id": "PHARM-HEALTHCARE-05",
+      "facility_name": "Apollo 24/7 Clinic & Daycare - 100ft Road",
+      "facility_type": "CLINIC",
+      "license_token": "PHARM-LIC-VERIFIED-VLC-05",
+      "verified": true,
+      "location": {
+        "lat": 12.9815,
+        "lng": 80.2198,
+        "ward_id": "WARD_14",
+        "address": "Plot 88, 100 Feet Bypass Road, Velachery West"
+      },
+      "contact_person": "Dr. T. Premnath (Duty Physician)"
+    }
+  ],
+  "volunteers": [
+    {
+      "volunteer_id": "VOL-101",
+      "name": "Karthik Subramanian (Velachery Rapid Rescue)",
+      "phone_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "lat": 12.977,
+      "lng": 80.2205,
+      "capabilities": ["BOAT", "WATER_RESCUE", "FIRST_AID"],
+      "available": false
+    },
+    {
+      "volunteer_id": "VOL-102",
+      "name": "Priya Sundaram (Red Cross TN Unit 4)",
+      "phone_hash": "a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0",
+      "lat": 12.9788,
+      "lng": 80.2235,
+      "capabilities": ["PARAMEDIC", "TRIAGE", "INSULIN_COLD_CHAIN"],
+      "available": true
+    },
+    {
+      "volunteer_id": "VOL-103",
+      "name": "Velachery Boat Squad Bravo (4-Man Dinghy)",
+      "phone_hash": "b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef01",
+      "lat": 12.9745,
+      "lng": 80.219,
+      "capabilities": ["BOAT", "HEAVY_EVACUATION", "LIFE_JACKETS"],
+      "available": true
+    },
+    {
+      "volunteer_id": "VOL-104",
+      "name": "Dr. Shalini Natarajan (Mobile Clinic Van)",
+      "phone_hash": "c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef012",
+      "lat": 12.976,
+      "lng": 80.222,
+      "capabilities": ["AMBULANCE", "MEDICAL_TRANSPORT", "DIALYSIS_CARE"],
+      "available": false
+    },
+    {
+      "volunteer_id": "VOL-105",
+      "name": "Arun Kumar (Community First Responder)",
+      "phone_hash": "d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0123",
+      "lat": 12.9805,
+      "lng": 80.2255,
+      "capabilities": ["DRINKING_WATER", "FOOD_RATIONS", "FIRST_AID"],
+      "available": true
+    },
+    {
+      "volunteer_id": "VOL-106",
+      "name": "GCC Mobile Chlorination Crew #3",
+      "phone_hash": "e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef01234",
+      "lat": 12.9735,
+      "lng": 80.224,
+      "capabilities": ["WATER_SANITATION", "CHLORINATION", "SEWAGE_TREATMENT"],
+      "available": true
+    }
+  ],
+  "sos_tickets": [
+    {
+      "ticket_id": "SOS-2026-0891",
+      "raw_input": "Velachery 4th main road, house #18. Water entered 1st floor! 72yr old grandpa needs dialysis immediately, sewage pipe burst and mixing with stagnant water!",
+      "language_detected": "en-IN (Tanglish)",
+      "location": {
+        "lat": 12.9756,
+        "lng": 80.2207,
+        "ward_id": "WARD_14",
+        "address": "18, 4th Main Road, Velachery"
+      },
+      "triage": {
+        "urgency_score": 9.6,
+        "category": "MEDICAL_EVACUATION",
+        "vulnerability_tags": ["ELDERLY", "DIALYSIS_DEPENDENT"],
+        "resources_needed": ["BOAT", "MEDICAL_TRANSPORT", "AMBULANCE"],
+        "environmental_hazard_logged": ["SEWAGE_OVERFLOW", "STAGNANT_FLOODWATER"],
+        "estimated_people_count": 3,
+        "actionable_summary": "Critically urgent: 72yo dialysis patient stranded by chest-deep sewage contaminated floodwater on 1st floor."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 4,
+        "similarity_score": 0.94,
+        "merge_reason": "Merged 3 repetitive neighbor calls from 4th Main Road"
+      },
+      "status": "MATCHED",
+      "assigned_volunteer_id": "VOL-104",
+      "assigned_volunteer_name": "Dr. Shalini Natarajan (Mobile Clinic Van)",
+      "assigned_volunteer_eta_minutes": 14,
+      "contact_phone_hash": "7a94b8c6e2d1f04589ab34ef7612c9803456deac98721345fedcba0987654321",
+      "safety_instructions": "Do not step into sewage water. Move patient to terrace or highest dry surface. Turn off main circuit breaker.",
+      "created_at": "2026-10-15T08:14:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0892",
+      "raw_input": "Bypass road near Vijayanagar arch, 5 people stranded on terrace. 2 pregnant women, water is 5 feet deep with black smelly sewage backflow.",
+      "language_detected": "en-IN (Tanglish)",
+      "location": {
+        "lat": 12.9768,
+        "lng": 80.2224,
+        "ward_id": "WARD_14",
+        "address": "Bypass Road, near Vijayanagar Arch, Velachery"
+      },
+      "triage": {
+        "urgency_score": 9.2,
+        "category": "STRANDED_FLOOD",
+        "vulnerability_tags": ["PREGNANT", "INFANT"],
+        "resources_needed": ["BOAT", "LIFE_JACKETS", "DRINKING_WATER"],
+        "environmental_hazard_logged": ["SEWAGE_OVERFLOW", "STAGNANT_FLOODWATER"],
+        "estimated_people_count": 5,
+        "actionable_summary": "5 trapped on rooftop including 2 pregnant women; heavy blackwater sewage surrounding building."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 2,
+        "similarity_score": 0.88,
+        "merge_reason": "Aggregated from 2 resident calls"
+      },
+      "status": "MATCHED",
+      "assigned_volunteer_id": "VOL-101",
+      "assigned_volunteer_name": "Karthik Subramanian (Velachery Rapid Rescue)",
+      "assigned_volunteer_eta_minutes": 9,
+      "contact_phone_hash": "8b05c9d7f3e2a15690bc45fa8723da914567efbd09832456afedcb1098765432",
+      "safety_instructions": "Remain on terrace. Keep orange or bright cloth visible for rescue boat team. Avoid touching flood runoff.",
+      "created_at": "2026-10-15T09:30:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0893",
+      "raw_input": "Murugu Nagar 2nd street, water entered drinking well. Well is completely flooded with drain water. 15 families have no drinking water.",
+      "language_detected": "ta-IN (Tamil / English)",
+      "location": {
+        "lat": 12.9739,
+        "lng": 80.2201,
+        "ward_id": "WARD_14",
+        "address": "Murugu Nagar 2nd St, Velachery"
+      },
+      "triage": {
+        "urgency_score": 7.8,
+        "category": "FOOD_WATER_CRITICAL",
+        "vulnerability_tags": ["INFANT", "CHRONIC_ILLNESS"],
+        "resources_needed": ["DRINKING_WATER", "WATER_PURIFICATION_TABLETS"],
+        "environmental_hazard_logged": ["CONTAMINATED_WELL", "SEWAGE_OVERFLOW"],
+        "estimated_people_count": 45,
+        "actionable_summary": "Community open well submerged by sewage flood; acute potable water emergency across 15 households."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 3,
+        "similarity_score": 0.89
+      },
+      "status": "OPEN",
+      "assigned_volunteer_id": null,
+      "assigned_volunteer_name": null,
+      "assigned_volunteer_eta_minutes": null,
+      "contact_phone_hash": "9c16dae8a4f3b26701cd56ab9834eb025678face10943567bafedc2109876543",
+      "safety_instructions": "DO NOT DRINK OR BOIL WELL WATER. Well is contaminated with fecal matter. Use bottled water only.",
+      "created_at": "2026-10-15T11:05:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0894",
+      "raw_input": "TANSI Nagar 11th Street, transformer sparking near water level! Live electric cable submerged in waist-deep water. Danger of electrocution!",
+      "language_detected": "en-IN (English)",
+      "location": {
+        "lat": 12.9784,
+        "lng": 80.2259,
+        "ward_id": "WARD_14",
+        "address": "TANSI Nagar 11th Street, Velachery"
+      },
+      "triage": {
+        "urgency_score": 9.4,
+        "category": "ELECTRICAL_HAZARD",
+        "vulnerability_tags": ["MOBILITY_IMPAIRED"],
+        "resources_needed": ["POWER_GRID_SHUTOFF", "BOAT"],
+        "environmental_hazard_logged": ["POWER_GRID_FAIL", "STAGNANT_FLOODWATER"],
+        "estimated_people_count": 20,
+        "actionable_summary": "Severe live electrical hazard in floodwater near residential cluster. TNEB grid trip needed immediately."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 5,
+        "similarity_score": 0.96
+      },
+      "status": "MATCHED",
+      "assigned_volunteer_id": "VOL-105",
+      "assigned_volunteer_name": "Arun Kumar (Community First Responder)",
+      "assigned_volunteer_eta_minutes": 6,
+      "contact_phone_hash": "0d27ebf9b5a4c37812de67bc0945fc136789abcd21054678cbafed3210987654",
+      "safety_instructions": "DANGER: Stay far away from the submerged transformer. Do not touch wet railings or step into standing water.",
+      "created_at": "2026-10-15T12:20:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0895",
+      "raw_input": "Kaiveli junction signal, ground floor old age home flooded. 8 senior citizens need rescue, two on wheelchairs.",
+      "language_detected": "en-IN (Tanglish)",
+      "location": {
+        "lat": 12.9725,
+        "lng": 80.2173,
+        "ward_id": "WARD_14",
+        "address": "Near Kaiveli Signal, Velachery Main Rd"
+      },
+      "triage": {
+        "urgency_score": 9.8,
+        "category": "MEDICAL_EVACUATION",
+        "vulnerability_tags": ["ELDERLY", "MOBILITY_IMPAIRED", "CHRONIC_ILLNESS"],
+        "resources_needed": ["BOAT", "MEDICAL_TRANSPORT", "WHEELCHAIR_LIFT"],
+        "environmental_hazard_logged": ["STAGNANT_FLOODWATER", "SEWAGE_OVERFLOW"],
+        "estimated_people_count": 10,
+        "actionable_summary": "Elderly care facility ground floor inundated with 4ft floodwater. 8 seniors trapped, urgent raft transport required."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 2,
+        "similarity_score": 0.91
+      },
+      "status": "MATCHED",
+      "assigned_volunteer_id": "VOL-103",
+      "assigned_volunteer_name": "Velachery Boat Squad Bravo (4-Man Dinghy)",
+      "assigned_volunteer_eta_minutes": 11,
+      "contact_phone_hash": "1e38fc0ac6b5d48923ef78cd1056ad247890bcde32165789dcbafe4321098765",
+      "safety_instructions": "Prop wheelchair patients above water level with tables and double bedding until rescue raft reaches door.",
+      "created_at": "2026-10-15T13:45:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0896",
+      "raw_input": "Velachery Lake bund overflow near Dhandeeswaram Nagar. Dead animal carcasses floating near municipal sump, water is contaminated black.",
+      "language_detected": "en-IN (English)",
+      "location": {
+        "lat": 12.9801,
+        "lng": 80.2218,
+        "ward_id": "WARD_14",
+        "address": "Dhandeeswaram Nagar Lake bund, Velachery"
+      },
+      "triage": {
+        "urgency_score": 8.5,
+        "category": "STRANDED_FLOOD",
+        "vulnerability_tags": ["INFANT", "ELDERLY"],
+        "resources_needed": ["WATER_SANITATION", "DISINFECTANT", "BOAT"],
+        "environmental_hazard_logged": ["CARCASS_DEBRIS", "SEWAGE_OVERFLOW", "STAGNANT_FLOODWATER"],
+        "estimated_people_count": 12,
+        "actionable_summary": "High bio-hazard risk: Animal carcasses and sewage stagnating near public water intake sump."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 3,
+        "similarity_score": 0.87
+      },
+      "status": "OPEN",
+      "assigned_volunteer_id": null,
+      "assigned_volunteer_name": null,
+      "assigned_volunteer_eta_minutes": null,
+      "contact_phone_hash": "2f49ad1bd7c6e59034fa89de2167be358901cdef43276890edcbaf5432109876",
+      "safety_instructions": "High infection vector. Do not walk barefoot. Cover any open skin abrasions. Boil all water before consumption.",
+      "created_at": "2026-10-15T15:10:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0897",
+      "raw_input": "Baby 8 months old running 104 fever and severe shivering, 100ft road near baby shop, flood water 3 feet high cannot take bike to clinic.",
+      "language_detected": "en-IN (Tanglish)",
+      "location": {
+        "lat": 12.9811,
+        "lng": 80.2204,
+        "ward_id": "WARD_14",
+        "address": "100ft Road near Baby Care, Velachery West"
+      },
+      "triage": {
+        "urgency_score": 9.1,
+        "category": "MEDICAL_EVACUATION",
+        "vulnerability_tags": ["INFANT"],
+        "resources_needed": ["AMBULANCE", "PEDIATRIC_CARE", "BOAT"],
+        "environmental_hazard_logged": ["STAGNANT_FLOODWATER"],
+        "estimated_people_count": 2,
+        "actionable_summary": "8mo infant with high febrile seizure risk stranded in waterlogged home; requires urgent paramedic extraction."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 1,
+        "similarity_score": 0.0
+      },
+      "status": "MATCHED",
+      "assigned_volunteer_id": "VOL-102",
+      "assigned_volunteer_name": "Priya Sundaram (Red Cross TN Unit 4)",
+      "assigned_volunteer_eta_minutes": 8,
+      "contact_phone_hash": "3a50be2ce8d7f60145ab90ef3278cf469012def054387901fedcba6543210987",
+      "safety_instructions": "Sponge baby forehead with lukewarm clean water. Do not submerge child in cold floodwater. Paramedic arriving.",
+      "created_at": "2026-10-15T16:40:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0898",
+      "raw_input": "AGS Colony 3rd Cross, sewage tank overflowed and mixed with our drinking water sump. Sump water is completely muddy and foul smelling.",
+      "language_detected": "en-IN (English)",
+      "location": {
+        "lat": 12.973,
+        "lng": 80.225,
+        "ward_id": "WARD_14",
+        "address": "AGS Colony 3rd Cross, Velachery"
+      },
+      "triage": {
+        "urgency_score": 7.5,
+        "category": "FOOD_WATER_CRITICAL",
+        "vulnerability_tags": ["CHRONIC_ILLNESS"],
+        "resources_needed": ["DRINKING_WATER", "WATER_PURIFICATION_TABLETS"],
+        "environmental_hazard_logged": ["SEWAGE_OVERFLOW", "CONTAMINATED_WELL"],
+        "estimated_people_count": 8,
+        "actionable_summary": "Residential underground water sump inundated with untreated municipal sewage."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 2,
+        "similarity_score": 0.9
+      },
+      "status": "OPEN",
+      "assigned_volunteer_id": null,
+      "assigned_volunteer_name": null,
+      "assigned_volunteer_eta_minutes": null,
+      "contact_phone_hash": "4b61cf3df9e8a71256bc01fa4389d0570123ef01654980120fedcb7654321098",
+      "safety_instructions": "Seal sump lid. Do not run household pumps as pipes will be contaminated. Drinking water distribution arranged.",
+      "created_at": "2026-10-15T18:00:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0899",
+      "raw_input": "Kamarajapuram lake edge, 3 diabetic patients ran out of insulin pens, power out for 36 hours. Road waterlogged 4 feet.",
+      "language_detected": "en-IN (Tanglish)",
+      "location": {
+        "lat": 12.9718,
+        "lng": 80.2229,
+        "ward_id": "WARD_14",
+        "address": "Kamarajapuram Lake Edge, Velachery"
+      },
+      "triage": {
+        "urgency_score": 8.7,
+        "category": "MEDICAL_EVACUATION",
+        "vulnerability_tags": ["DIABETIC", "ELDERLY"],
+        "resources_needed": ["INSULIN_COLD_CHAIN", "DRINKING_WATER", "BOAT"],
+        "environmental_hazard_logged": ["STAGNANT_FLOODWATER", "POWER_GRID_FAIL"],
+        "estimated_people_count": 4,
+        "actionable_summary": "3 diabetic patients without refrigerated insulin for 36+ hrs; road cutoff by 4ft water."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 1,
+        "similarity_score": 0.0
+      },
+      "status": "MATCHED",
+      "assigned_volunteer_id": "VOL-102",
+      "assigned_volunteer_name": "Priya Sundaram (Red Cross TN Unit 4)",
+      "assigned_volunteer_eta_minutes": 17,
+      "contact_phone_hash": "5c72d04ea0f9b82367cd12ab5490e1681234f0127650912310fedc8765432109",
+      "safety_instructions": "Keep hydrated with clean bottled water. Red Cross paramedic carrying cold-pack insulin reserves.",
+      "created_at": "2026-10-15T19:25:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0900",
+      "raw_input": "Gandhi Road 5th street, boundary wall of old building collapsed into alleyway, 2 people got bruised, need first aid and food packets.",
+      "language_detected": "ta-IN (Tamil / English)",
+      "location": {
+        "lat": 12.9772,
+        "lng": 80.2168,
+        "ward_id": "WARD_14",
+        "address": "Gandhi Road 5th St, Velachery"
+      },
+      "triage": {
+        "urgency_score": 7.2,
+        "category": "STRUCTURAL_COLLAPSE",
+        "vulnerability_tags": ["CHRONIC_ILLNESS"],
+        "resources_needed": ["FIRST_AID", "FOOD_RATIONS", "DEBRIS_CLEARANCE"],
+        "environmental_hazard_logged": ["CARCASS_DEBRIS", "STAGNANT_FLOODWATER"],
+        "estimated_people_count": 6,
+        "actionable_summary": "Partial compound wall collapse; minor trauma injuries requiring antiseptic dressing and clean food."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 1,
+        "similarity_score": 0.0
+      },
+      "status": "OPEN",
+      "assigned_volunteer_id": null,
+      "assigned_volunteer_name": null,
+      "assigned_volunteer_eta_minutes": null,
+      "contact_phone_hash": "6d83e15fb10ac93478de23bc6501f279234501238761023421fedc9876543210",
+      "safety_instructions": "Stay clear of unstable masonry. Apply pressure with clean cloth on bleeding cuts. Volunteer dispatched.",
+      "created_at": "2026-10-15T21:10:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0901",
+      "raw_input": "VGP Selva Nagar, water is draining slowly but entire street is covered in foul smelling black sludge and dead fish from canal overflow.",
+      "language_detected": "en-IN (English)",
+      "location": {
+        "lat": 12.9822,
+        "lng": 80.2232,
+        "ward_id": "WARD_14",
+        "address": "VGP Selva Nagar Main Rd, Velachery"
+      },
+      "triage": {
+        "urgency_score": 6.8,
+        "category": "FOOD_WATER_CRITICAL",
+        "vulnerability_tags": ["INFANT", "ELDERLY"],
+        "resources_needed": ["WATER_SANITATION", "DISINFECTANT", "BLEACHING_POWDER"],
+        "environmental_hazard_logged": ["CARCASS_DEBRIS", "SEWAGE_OVERFLOW", "STAGNANT_FLOODWATER"],
+        "estimated_people_count": 18,
+        "actionable_summary": "Canal siltation and decaying organic debris along residential street creating severe bio-pathogen breeding zone."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 2,
+        "similarity_score": 0.86
+      },
+      "status": "OPEN",
+      "assigned_volunteer_id": null,
+      "assigned_volunteer_name": null,
+      "assigned_volunteer_eta_minutes": null,
+      "contact_phone_hash": "7e94f260c21bd04589ef34cd76120380345612349872134532fedca987654321",
+      "safety_instructions": "Avoid all skin contact with canal sludge. Disinfect footwear with bleaching powder before entering homes.",
+      "created_at": "2026-10-16T02:00:00Z"
+    },
+    {
+      "ticket_id": "SOS-2026-0902",
+      "raw_input": "Baby Nagar near railway station, community borewell water is coming yellow with strong chemical/sewage smell. People developing vomiting after drinking.",
+      "language_detected": "en-IN (Tanglish)",
+      "location": {
+        "lat": 12.9798,
+        "lng": 80.2182,
+        "ward_id": "WARD_14",
+        "address": "Baby Nagar, near Velachery MRTS Station"
+      },
+      "triage": {
+        "urgency_score": 8.9,
+        "category": "FOOD_WATER_CRITICAL",
+        "vulnerability_tags": ["INFANT", "ELDERLY"],
+        "resources_needed": ["DRINKING_WATER", "CHLORINATION", "MEDICAL_TRANSPORT"],
+        "environmental_hazard_logged": ["CONTAMINATED_WELL", "SEWAGE_OVERFLOW"],
+        "estimated_people_count": 30,
+        "actionable_summary": "Direct contamination of community borewell aquifer with early symptomatic vomiting reported in local cluster."
+      },
+      "deduplication": {
+        "is_duplicate": false,
+        "duplicate_count": 3,
+        "similarity_score": 0.92
+      },
+      "status": "OPEN",
+      "assigned_volunteer_id": null,
+      "assigned_volunteer_name": null,
+      "assigned_volunteer_eta_minutes": null,
+      "contact_phone_hash": "8f05a371d32ce15690fa45de87231491456723450983245643fedcb098765432",
+      "safety_instructions": "CEASE USING BOREWELL WATER IMMEDIATELY. Chlorination tankers dispatched to MRTS station forecourt.",
+      "created_at": "2026-10-16T06:30:00Z"
+    }
+  ],
+  "pharmacy_pulses": [
+    {
+      "pulse_id": "PHARM-2026-401",
+      "facility_id": "PHARM-MEDPLUS-01",
+      "facility_name": "MedPlus Pharmacy - Velachery Main Rd",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9765,
+        "lng": 80.2215,
+        "ward_id": "WARD_14",
+        "address": "No. 42, Velachery Main Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "VOMITING", "DEHYDRATION"],
+        "medications_spiking": ["ORS_PACKETS", "DOXYCYCLINE", "ANTI_DIARRHEAL"],
+        "estimated_patient_count": 68,
+        "stockout_warning": ["ORS_PACKETS"],
+        "urgency_velocity": 8.5
+      },
+      "raw_summary": "Sold out 85 packets of ORS in 4 hours. 60+ patients presenting with rice-water diarrhea and vomiting. All from 4th Main and Bypass area.",
+      "created_at": "2026-10-18T09:15:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-402",
+      "facility_id": "PHARM-APOLLO-02",
+      "facility_name": "Apollo Pharmacy - Bypass Junction",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9792,
+        "lng": 80.2241,
+        "ward_id": "WARD_14",
+        "address": "Velachery Bypass Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "HIGH_FEVER", "ABDOMINAL_CRAMPS"],
+        "medications_spiking": ["DOXYCYCLINE", "ORS_PACKETS", "CIPROFLOXACIN"],
+        "estimated_patient_count": 74,
+        "stockout_warning": ["DOXYCYCLINE", "IV_FLUIDS"],
+        "urgency_velocity": 8.9
+      },
+      "raw_summary": "Unprecedented surge in prescription antibiotics (Doxycycline, Ciprofloxacin) and oral rehydration. Stockout of IV normal saline.",
+      "created_at": "2026-10-18T11:30:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-403",
+      "facility_id": "CLINIC-VELACHERY-04",
+      "facility_name": "Velachery Urban Primary Health Centre (UPHC)",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9752,
+        "lng": 80.2185,
+        "ward_id": "WARD_14",
+        "address": "GCC Community Health Complex"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "DEHYDRATION", "VOMITING", "HIGH_FEVER"],
+        "medications_spiking": ["IV_FLUIDS", "ORS_PACKETS", "DOXYCYCLINE"],
+        "estimated_patient_count": 92,
+        "stockout_warning": ["IV_FLUIDS", "PEDIATRIC_ORS"],
+        "urgency_velocity": 9.4
+      },
+      "raw_summary": "OPD flooded with 90+ acute gastroenteritis cases since morning. 14 severe dehydration cases on floor mattresses. Water source contaminated by sewage.",
+      "created_at": "2026-10-18T14:00:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-404",
+      "facility_id": "PHARM-JANAUSHADHI-03",
+      "facility_name": "Pradhan Mantri Jan Aushadhi Kendra - Taramani Link",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9741,
+        "lng": 80.2268,
+        "ward_id": "WARD_14",
+        "address": "15/B Taramani Link Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "ABDOMINAL_CRAMPS"],
+        "medications_spiking": ["ORS_PACKETS", "PARACETAMOL", "ANTI_DIARRHEAL"],
+        "estimated_patient_count": 48,
+        "stockout_warning": ["ORS_PACKETS"],
+        "urgency_velocity": 7.4
+      },
+      "raw_summary": "Low-cost ORS generic packets exhausted. Families buying 10-15 sachets each. Reporting bad tap water in AGS Colony.",
+      "created_at": "2026-10-18T16:20:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-405",
+      "facility_id": "PHARM-HEALTHCARE-05",
+      "facility_name": "Apollo 24/7 Clinic & Daycare - 100ft Road",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9815,
+        "lng": 80.2198,
+        "ward_id": "WARD_14",
+        "address": "100 Feet Bypass Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["HIGH_FEVER", "BODY_ACHE", "SKIN_RASH", "VOMITING"],
+        "medications_spiking": ["PARACETAMOL", "ANTI_DIARRHEAL", "IV_FLUIDS"],
+        "estimated_patient_count": 55,
+        "stockout_warning": ["PARACETAMOL_SYRUP"],
+        "urgency_velocity": 8.0
+      },
+      "raw_summary": "Pediatric ward full with high fever and sudden onset watery stools. Parents report water smells foul after flood receded.",
+      "created_at": "2026-10-19T08:45:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-406",
+      "facility_id": "PHARM-MEDPLUS-01",
+      "facility_name": "MedPlus Pharmacy - Velachery Main Rd",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9765,
+        "lng": 80.2215,
+        "ward_id": "WARD_14",
+        "address": "No. 42, Velachery Main Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "DEHYDRATION"],
+        "medications_spiking": ["ORS_PACKETS", "DOXYCYCLINE", "IV_FLUIDS"],
+        "estimated_patient_count": 82,
+        "stockout_warning": ["ORS_PACKETS", "CIPROFLOXACIN"],
+        "urgency_velocity": 9.1
+      },
+      "raw_summary": "Day 2 of surge: Demand up 380% vs baseline. Wholesale distributor delivery delayed due to route sludge.",
+      "created_at": "2026-10-19T10:30:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-407",
+      "facility_id": "CLINIC-VELACHERY-04",
+      "facility_name": "Velachery Urban Primary Health Centre (UPHC)",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9752,
+        "lng": 80.2185,
+        "ward_id": "WARD_14",
+        "address": "GCC Community Health Complex"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "DEHYDRATION", "VOMITING"],
+        "medications_spiking": ["DOXYCYCLINE", "IV_FLUIDS", "ORS_PACKETS"],
+        "estimated_patient_count": 115,
+        "stockout_warning": ["IV_FLUIDS", "DOXYCYCLINE"],
+        "urgency_velocity": 9.7
+      },
+      "raw_summary": "Stool microscopy tests confirm suspected Vibrio cholerae / enterotoxin bacterial cluster. Immediate district containment protocol requested.",
+      "created_at": "2026-10-19T12:00:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-408",
+      "facility_id": "PHARM-APOLLO-02",
+      "facility_name": "Apollo Pharmacy - Bypass Junction",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9792,
+        "lng": 80.2241,
+        "ward_id": "WARD_14",
+        "address": "Velachery Bypass Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["HIGH_FEVER", "ACUTE_DIARRHEA"],
+        "medications_spiking": ["PARACETAMOL", "ORS_PACKETS", "DOXYCYCLINE"],
+        "estimated_patient_count": 60,
+        "stockout_warning": ["DOXYCYCLINE"],
+        "urgency_velocity": 8.3
+      },
+      "raw_summary": "Continuous customer line for electrolyte solutions and anti-emetics. Many patients complain of well contamination in Murugu Nagar.",
+      "created_at": "2026-10-19T14:15:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-409",
+      "facility_id": "PHARM-JANAUSHADHI-03",
+      "facility_name": "Pradhan Mantri Jan Aushadhi Kendra - Taramani Link",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9741,
+        "lng": 80.2268,
+        "ward_id": "WARD_14",
+        "address": "15/B Taramani Link Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "VOMITING"],
+        "medications_spiking": ["ANTI_DIARRHEAL", "ORS_PACKETS"],
+        "estimated_patient_count": 45,
+        "stockout_warning": ["ANTI_DIARRHEAL"],
+        "urgency_velocity": 7.8
+      },
+      "raw_summary": "Loperamide and Metronidazole stocks depleted. Local residents asking for bleaching powder for their domestic sumps.",
+      "created_at": "2026-10-19T16:00:00Z"
+    },
+    {
+      "pulse_id": "PHARM-2026-410",
+      "facility_id": "PHARM-HEALTHCARE-05",
+      "facility_name": "Apollo 24/7 Clinic & Daycare - 100ft Road",
+      "verified_license": true,
+      "location": {
+        "lat": 12.9815,
+        "lng": 80.2198,
+        "ward_id": "WARD_14",
+        "address": "100 Feet Bypass Road"
+      },
+      "extracted_signals": {
+        "symptom_clusters": ["ACUTE_DIARRHEA", "DEHYDRATION", "HIGH_FEVER"],
+        "medications_spiking": ["IV_FLUIDS", "DOXYCYCLINE", "ORS_PACKETS"],
+        "estimated_patient_count": 70,
+        "stockout_warning": ["IV_FLUIDS"],
+        "urgency_velocity": 8.8
+      },
+      "raw_summary": "12 adult patients placed on emergency rehydration cots. Spatio-temporal cluster heavily aligns with the flooded 4th Main sewage breach.",
+      "created_at": "2026-10-19T17:30:00Z"
+    }
+  ],
+  "baseline_outbreak_alert_day5": {
+    "alert_id": "EPI-2026-09",
+    "ward_id": "WARD_14",
+    "risk_probability": 0.93,
+    "risk_level": "CRITICAL",
+    "suspected_pathogen_class": "Waterborne Enteric (Vibrio cholerae / Acute Epidemic Gastroenteritis)",
+    "causal_chain_reasoning": "Gemini 2.5 Pro Causal Link: 8 distinct SEWAGE_OVERFLOW & CONTAMINATED_WELL disaster tickets logged during Phase 1 (Oct 15-16, centering on 4th Main Road & Murugu Nagar) are directly upstream of 5 reporting pharmacies exhibiting a 380% surge in ORS, Doxycycline, and IV fluid requests (587 presenting patients over 48 hours). Stagnant water + 88% ambient humidity has accelerated bacterial transmission in the municipal pipe network.",
+    "environmental_drivers": [
+      "SEWAGE_OVERFLOW (7 persistent nodes)",
+      "CONTAMINATED_WELL (3 community sumps)",
+      "STAGNANT_FLOODWATER (Receding blackwater pools)",
+      "HIGH_HUMIDITY (88% Open-Meteo telemetry)"
+    ],
+    "pharmacy_signal_count": 10,
+    "recommended_municipal_actions": [
+      "Deploy GCC Mobile Chlorination Tanker to 4th Main Road and Murugu Nagar immediately",
+      "Trigger Emergency Medical Inventory Restock: 5,000 ORS sachets and 500L Ringer's Lactate to Velachery UPHC",
+      "Issue urgent public SMS and loudspeaker Boiled-Water Advisory across Ward 14",
+      "Isolate broken sewage mains at Vijayanagar Junction to prevent secondary aquifer seepage"
+    ],
+    "action_proposals": [
+      {
+        "action_id": "ACT-2026-01",
+        "action_type": "trigger_municipal_containment_protocol",
+        "title": "Trigger Municipal Containment Protocol (Ward 14)",
+        "target_area": "Velachery Ward 14 (4th Main & Murugu Nagar)",
+        "urgency": "CRITICAL",
+        "status": "PENDING_APPROVAL",
+        "parameters": {
+          "protocol_code": "EPIDEMIC-STAGE-2-WATERBORNE",
+          "chlorination_ppm": 2.5,
+          "alert_broadcast": true,
+          "affected_population_estimate": 115000
+        }
+      },
+      {
+        "action_id": "ACT-2026-02",
+        "action_type": "dispatch_volunteer_resource",
+        "title": "Dispatch Mobile Chlorination Crew #3 & Water Tanker",
+        "target_area": "4th Main Road & Murugu Nagar 2nd St",
+        "urgency": "HIGH",
+        "status": "PENDING_APPROVAL",
+        "parameters": {
+          "crew_id": "VOL-106",
+          "resource": "CHLORINATION_TANKER_5000L",
+          "priority": "P0_IMMEDIATE"
+        }
+      },
+      {
+        "action_id": "ACT-2026-03",
+        "action_type": "restock_medical_inventory",
+        "title": "Emergency Stock Re-supply to Velachery UPHC & MedPlus",
+        "target_area": "GCC Community Health Complex & MedPlus Main",
+        "urgency": "HIGH",
+        "status": "PENDING_APPROVAL",
+        "parameters": {
+          "ors_cartons": 50,
+          "iv_fluids_rl_cases": 25,
+          "doxycycline_100mg_tabs": 2000
+        }
+      }
+    ],
+    "weather_context": {
+      "temperature_c": 31.4,
+      "relative_humidity_pct": 88.0,
+      "precipitation_mm": 18.2,
+      "source": "Open-Meteo Real-time Weather API"
+    },
+    "generated_at": "2026-10-19T18:00:00Z"
+  },
+  "baseline_outbreak_alert_day1": {
+    "alert_id": "EPI-2026-01",
+    "ward_id": "WARD_14",
+    "risk_probability": 0.22,
+    "risk_level": "LOW",
+    "suspected_pathogen_class": "Early Latent Contamination Phase (Pre-symptomatic incubation)",
+    "causal_chain_reasoning": "Active acute disaster flooding (Wave 1). Severe physical rescue bottlenecks underway with 12 active emergency tickets. Sewage overflows detected at 7 locations, creating severe prospective bio-hazard seeding, but OTC pharmacy syndromic velocity remains at baseline.",
+    "environmental_drivers": [
+      "STAGNANT_FLOODWATER (Active inundation)",
+      "SEWAGE_OVERFLOW (7 breach sites)",
+      "POWER_GRID_FAIL"
+    ],
+    "pharmacy_signal_count": 0,
+    "recommended_municipal_actions": [
+      "Prioritize life-critical boat rescues (Elderly dialysis & pregnant women)",
+      "Document and map all sewage pipe overflow coordinates for post-flood bio-surveillance",
+      "Deploy community water purification sachets with food ration boats"
+    ],
+    "action_proposals": [
+      {
+        "action_id": "ACT-2026-001",
+        "action_type": "dispatch_volunteer_resource",
+        "title": "Dispatch Velachery Boat Squad Bravo to Kaiveli Elderly Home",
+        "target_area": "Kaiveli Signal, Velachery Main Rd",
+        "urgency": "CRITICAL",
+        "status": "APPROVED",
+        "approved_by": "Chief Municipal Health Officer",
+        "approved_at": "2026-10-15T14:00:00Z",
+        "parameters": {
+          "volunteer_id": "VOL-103",
+          "ticket_id": "SOS-2026-0895"
+        }
+      }
+    ],
+    "weather_context": {
+      "temperature_c": 27.2,
+      "relative_humidity_pct": 94.0,
+      "precipitation_mm": 142.5,
+      "source": "Open-Meteo Real-time Weather API"
+    },
+    "generated_at": "2026-10-15T10:00:00Z"
+  }
+}
