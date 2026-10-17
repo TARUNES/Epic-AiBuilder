@@ -87,6 +87,31 @@ To ensure authenticity, safety, and operational usability, the application separ
 3. **Semantic De-duplication** — `text-embedding-004` 768-dim vectors; cosine similarity ≥ 0.85 + Haversine distance < 300m → merge duplicate ticket, boost urgency, eliminate duplicate pins.
 4. **Autonomous Volunteer Micro-Matching** — Nearest volunteer/NGO response squad auto-assigned with ETA calculation.
 
+**Reporting Flow**:
+
+Citizen Ingest (Audio/Text + Address)
+                │
+                ▼
+1. Multilingual Triage (Gemini 2.5 Flash) ─── Extracts Urgency (1-10), Vulnerabilities & Hazards
+                │
+                ▼
+2. Geocoding Engine ──────────────────────── Resolves "4th Main Road" to GPS [12.9756, 80.2207]
+                │
+                ▼
+3. PII Hashing ───────────────────────────── SHA-256 phone hash
+                │
+                ▼
+4. 768-dim Semantic De-duplication ───────── text-embedding-004 + Haversine distance (<300m)
+                ├── [If Duplicate]: Merges ticket, boosts urgency (+0.3), no new map clutter
+                └── [If Unique]: Assigns Ticket ID (e.g. SOS-2026-F89A)
+                │
+                ▼
+5. Autonomous Micro-Matching ─────────────── Auto-assigns nearest volunteer squad & calculates ETA
+                │
+                ▼
+          State Store Persistence
+
+
 ### Phase 2 — Outbreak Early Warning Radar (Days 3–14)
 
 > **Key Architectural Insight:** Phase 1 `environmental_hazard_logged` tags (`SEWAGE_OVERFLOW`, `STAGNANT_FLOODWATER`, `CONTAMINATED_WELL`) **persist into Phase 2 as bio-risk anchors** after floodwaters recede.
