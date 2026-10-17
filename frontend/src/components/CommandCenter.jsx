@@ -6,8 +6,8 @@ import {
   Store, 
   TrendingUp, 
   RefreshCw,
-  UserCheck,
-  CheckCircle
+  AlertTriangle,
+  Users
 } from 'lucide-react';
 import TimeHorizonSlider from './TimeHorizonSlider';
 import EpicHourMap from './EpicHourMap';
@@ -16,9 +16,9 @@ import EpidemicReasoningCard from './EpidemicReasoningCard';
 const CATEGORY_NAMES = {
   MEDICAL_EVACUATION: 'Medical Evacuation',
   STRANDED_FLOOD: 'Stranded Flood Rescue',
-  FOOD_WATER_CRITICAL: 'Potable Water & Food Crisis',
-  STRUCTURAL_COLLAPSE: 'Structural Collapse',
-  ELECTRICAL_HAZARD: 'Electrical Grid Hazard'
+  FOOD_WATER_CRITICAL: 'Drinking Water & Food',
+  STRUCTURAL_COLLAPSE: 'Structural Hazard',
+  ELECTRICAL_HAZARD: 'Submerged Power Grid'
 };
 
 export default function CommandCenter({
@@ -32,7 +32,6 @@ export default function CommandCenter({
   onActionApproved,
   onRefresh
 }) {
-
   const tickets = systemState?.active_sos_tickets || [];
   const facilities = systemState?.verified_facilities || [];
   const volunteers = systemState?.volunteers || [];
@@ -48,40 +47,42 @@ export default function CommandCenter({
     (t) => t.triage?.environmental_hazard_logged?.length > 0
   ).length;
 
+  const criticalCount = tickets.filter(
+    (t) => (t.triage?.urgency_score || 0) >= 9.0
+  ).length;
+
+  const availableVolunteers = volunteers.filter((v) => v.available).length;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="space-y-6 text-[#ededf3]">
       
-      {/* Ward 14 Command Operations Header */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black shrink-0">
-            <Building2 className="w-6 h-6" />
+      {/* Top Header Card */}
+      <div className="mercury-panel p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-[#5266eb]/20 text-[#9bb4e6]">
+              Ward 14 Velachery
+            </span>
+            <span className="text-xs text-[#afb4cd] font-light">
+              Greater Chennai Corporation
+            </span>
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
-                Municipal Crisis & Public Health Operations Center
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
-                Official Access
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">
-              Ward 14 (Velachery) · Greater Chennai Corporation · Incident Commander: <strong className="text-slate-800">{currentUser?.user?.name || 'Dr. M. Natarajan, IAS'}</strong>
-            </p>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-normal text-[#ededf3] tracking-tight">
+            Municipal Crisis Operations
+          </h2>
+          <p className="text-xs text-[#c3c3cc] font-light">
+            Incident Commander: <strong className="text-[#ededf3] font-normal">{currentUser?.user?.name || 'Dr. M. Natarajan, IAS'}</strong>
+          </p>
         </div>
 
-        <div className="flex items-center space-x-3">
-          <button
-            type="button"
-            onClick={onRefresh}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 shadow-2xs transition-all"
-          >
-            <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
-            <span>Sync Live Telemetry</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onRefresh}
+          className="mercury-btn-ghost text-xs self-start md:self-auto"
+        >
+          <RefreshCw className="w-3.5 h-3.5 text-[#9bb4e6]" />
+          <span>Sync Live Telemetry</span>
+        </button>
       </div>
 
       {/* Time Horizon Slider Bar */}
@@ -93,64 +94,97 @@ export default function CommandCenter({
         isSimulating={isSimulating}
       />
 
-      {/* Primary 12-Column Grid: Tactical Map & Epidemiological Reasoning */}
+      {/* Primary Grid: Tactical Map & Epidemiological Reasoning */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left Column (7 cols): Map & Quick Metrics Strip */}
+        {/* Left Column (7 cols): Map & Phase-Tailored 3-Tile Metrics */}
         <div className="lg:col-span-7 space-y-4">
-          <EpicHourMap
-            phase={currentPhase}
-            tickets={tickets}
-            facilities={facilities}
-            volunteers={volunteers}
-            pulses={pulses}
-          />
-
-          {/* Quick Metrics Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">
-                Active SOS Incidents
-              </span>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-xl font-black text-red-600">{tickets.length}</span>
-                <LifeBuoy className="w-4 h-4 text-red-500" />
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">
-                Persisted Hazard Breach
-              </span>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-xl font-black text-purple-700">{hazardCount} nodes</span>
-                <Droplets className="w-4 h-4 text-purple-600" />
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">
-                Reporting Clinics
-              </span>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-xl font-black text-teal-700">{facilities.length} verified</span>
-                <Store className="w-4 h-4 text-teal-600" />
-              </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block">
-                Presenting Patients (24h)
-              </span>
-              <div className="flex items-center justify-between mt-1">
-                <span className="text-xl font-black text-slate-900">{totalPatients}</span>
-                <TrendingUp className="w-4 h-4 text-blue-600" />
-              </div>
-            </div>
+          
+          <div className="mercury-panel p-2">
+            <EpicHourMap
+              phase={currentPhase}
+              tickets={tickets}
+              facilities={facilities}
+              volunteers={volunteers}
+              pulses={pulses}
+            />
           </div>
+
+          {/* Clean 3-Tile Metric Strip */}
+          {currentPhase === 1 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mercury-panel p-4 space-y-1">
+                <span className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider block">
+                  Active Emergency SOS
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-2xl font-normal text-[#ededf3]">{tickets.length}</span>
+                  <span className="text-xs text-[#9bb4e6]">Live queue</span>
+                </div>
+                <span className="text-xs text-[#c3c3cc] font-light block">Citizen rescue tickets</span>
+              </div>
+
+              <div className="mercury-panel p-4 space-y-1">
+                <span className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider block">
+                  P0 Life-Threatening
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-2xl font-normal text-[#fc92b4]">{criticalCount}</span>
+                  <span className="text-xs text-[#fc92b4]">Critical</span>
+                </div>
+                <span className="text-xs text-[#c3c3cc] font-light block">Score ≥ 9.0/10</span>
+              </div>
+
+              <div className="mercury-panel p-4 space-y-1">
+                <span className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider block">
+                  Field Responders Ready
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-2xl font-normal text-[#ededf3]">{availableVolunteers} / {volunteers.length}</span>
+                  <span className="text-xs text-[#5266eb]">Deployed</span>
+                </div>
+                <span className="text-xs text-[#c3c3cc] font-light block">Boats & paramedics</span>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mercury-panel p-4 space-y-1">
+                <span className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider block">
+                  Clinic Surveillance Pulses
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-2xl font-normal text-[#ededf3]">{pulses.length}</span>
+                  <span className="text-xs text-[#5266eb]">Active</span>
+                </div>
+                <span className="text-xs text-[#c3c3cc] font-light block">{totalPatients} presenting patients</span>
+              </div>
+
+              <div className="mercury-panel p-4 space-y-1">
+                <span className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider block">
+                  Bio-Hazard Anchors
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-2xl font-normal text-[#fc92b4]">{hazardCount}</span>
+                  <span className="text-xs text-[#fc92b4]">Breach</span>
+                </div>
+                <span className="text-xs text-[#c3c3cc] font-light block">Sewage contamination sites</span>
+              </div>
+
+              <div className="mercury-panel p-4 space-y-1">
+                <span className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider block">
+                  Verified Clinics
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-2xl font-normal text-[#ededf3]">{facilities.length}</span>
+                  <span className="text-xs text-[#9bb4e6]">Reporting</span>
+                </div>
+                <span className="text-xs text-[#c3c3cc] font-light block">Pharmacies & UPHCs</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Column (5 cols): Epidemiological Reasoning & Human-in-the-Loop Action Orders */}
+        {/* Right Column (5 cols): Epidemiological Reasoning Card */}
         <div className="lg:col-span-5 space-y-4">
           <EpidemicReasoningCard
             alert={alert}
@@ -160,71 +194,79 @@ export default function CommandCenter({
 
       </div>
 
-      {/* Bottom: Active SOS Emergency Dispatch Queue Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      {/* Bottom Dispatch / Audit Table with Hairline Dividers */}
+      <div className="mercury-panel p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-[rgba(175,180,205,0.12)] pb-3">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-              Active Incident Dispatch Queue (Ward 14)
+            <h3 className="text-base font-normal text-[#ededf3]">
+              {currentPhase === 1 ? 'Live Incident Dispatch Queue' : 'Historical Hazard Audit Log'}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Live status of citizen emergency calls, de-duplication clustering, and assigned response squads.
+            <p className="text-xs text-[#c3c3cc] font-light mt-0.5">
+              {currentPhase === 1 
+                ? 'Status of emergency calls, de-duplication clustering, and assigned response squads.'
+                : 'Audited Phase 1 SOS tickets persisting as epidemiological bio-hazard correlates.'}
             </p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
-            {tickets.length} Active Dispatch Tickets
+          <span className="text-xs font-mono px-3 py-1 rounded-full bg-[#272735] text-[#afb4cd]">
+            {tickets.length} Registered
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px]">
+              <tr className="border-b border-[rgba(175,180,205,0.12)] text-[#afb4cd] font-mono uppercase text-[10px]">
                 <th className="py-2.5 px-3">Ticket ID</th>
                 <th className="py-2.5 px-3">Category</th>
                 <th className="py-2.5 px-3">Priority</th>
                 <th className="py-2.5 px-3">Location</th>
-                <th className="py-2.5 px-3">Assigned Squad</th>
+                <th className="py-2.5 px-3">{currentPhase === 1 ? 'Assigned Squad' : 'Hazard Logged'}</th>
                 <th className="py-2.5 px-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-[rgba(175,180,205,0.08)] text-[#ededf3]">
               {tickets.map((t) => (
-                <tr key={t.ticket_id} className="hover:bg-slate-50 transition-colors">
-                  <td className="py-3 px-3 font-mono font-bold text-slate-900">
+                <tr key={t.ticket_id} className="hover:bg-[#272735]/40 transition-colors">
+                  <td className="py-3 px-3 font-mono text-[#ededf3]">
                     #{t.ticket_id}
                   </td>
-                  <td className="py-3 px-3 font-medium">
+                  <td className="py-3 px-3 font-light text-[#c3c3cc]">
                     {CATEGORY_NAMES[t.triage?.category] || t.triage?.category}
                   </td>
                   <td className="py-3 px-3">
-                    <span className={`px-2 py-0.5 rounded font-bold font-mono text-[11px] ${
+                    <span className={`px-2.5 py-0.5 rounded-full font-mono text-[11px] ${
                       t.triage?.urgency_score >= 9.0 
-                        ? 'bg-red-100 text-red-800' 
-                        : t.triage?.urgency_score >= 7.5
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-blue-100 text-blue-800'
+                        ? 'bg-[#fc92b4]/20 text-[#fc92b4]' 
+                        : 'bg-[#5266eb]/20 text-[#9bb4e6]'
                     }`}>
                       {t.triage?.urgency_score} / 10
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-slate-600 max-w-xs truncate">
+                  <td className="py-3 px-3 max-w-xs truncate text-[#afb4cd] font-light">
                     {t.location?.address}
                   </td>
                   <td className="py-3 px-3">
-                    {t.assigned_volunteer_name ? (
-                      <span className="inline-flex items-center gap-1 text-slate-800 font-medium">
-                        <UserCheck className="w-3.5 h-3.5 text-blue-600" />
-                        {t.assigned_volunteer_name}
-                      </span>
+                    {currentPhase === 1 ? (
+                      t.assigned_volunteer_name ? (
+                        <span className="text-[#ededf3] font-light">
+                          {t.assigned_volunteer_name} (~{t.assigned_volunteer_eta_minutes}m)
+                        </span>
+                      ) : (
+                        <span className="text-[#afb4cd] italic">Auto-matching...</span>
+                      )
                     ) : (
-                      <span className="text-slate-400 italic">Unassigned</span>
+                      t.triage?.environmental_hazard_logged?.length > 0 ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-[#fc92b4]/20 text-[#fc92b4]">
+                          {t.triage.environmental_hazard_logged.join(', ')}
+                        </span>
+                      ) : (
+                        <span className="text-[#afb4cd]">None</span>
+                      )
                     )}
                   </td>
                   <td className="py-3 px-3">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      <CheckCircle className="w-3 h-3 text-emerald-600" />
-                      {t.status === 'MATCHED' ? 'Squad Dispatched' : 'Active'}
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-[#5266eb]/15 text-[#9bb4e6]">
+                      {t.status || 'ACTIVE'}
                     </span>
                   </td>
                 </tr>
