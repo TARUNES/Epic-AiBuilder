@@ -22,11 +22,7 @@ Climate disasters claim lives in two distinct, sequential waves:
 
 Existing disaster tools are disconnected: rescue trackers archive their data as soon as floodwaters recede, while municipal public health systems operate in silos.
 
-<<<<<<< HEAD
-**EPIC-Hour connects both phases into a unified, causal intelligence pipeline.** Environmental hazards logged during Phase 1 acute rescues are preserved as **upstream bio-hazard anchors**. When neighborhood pharmacies log over-the-counter (OTC) medication rushes in Phase 2, the causal engine cross-references the historical breach coordinates with live syndromic spikes to predict waterborne outbreaks up to 10 days before hospital admission spikes.
-=======
 **EPIC-Hour connects both phases into a unified, cloud-native causal intelligence pipeline.** Environmental hazards logged during Phase 1 acute rescues are preserved as **upstream bio-hazard anchors**. When neighborhood pharmacies log over-the-counter (OTC) medication rushes in Phase 2, Google Gemini cross-references the historical breach coordinates with live syndromic spikes to predict waterborne outbreaks up to 10 days before hospital admission spikes.
->>>>>>> 1bc5133d95c648fd38ee2e2da1f6a910474e44b2
 
 ---
 
