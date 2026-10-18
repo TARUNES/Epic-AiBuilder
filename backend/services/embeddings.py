@@ -51,22 +51,30 @@ def _generate_deterministic_embedding(text: str, dim: int = 768) -> List[float]:
 
 def get_embedding(text: str) -> List[float]:
     """
-    Generates a 768-dim semantic embedding using Google text-embedding-004.
+    Generates a semantic embedding using Google gemini-embedding-001.
+    Supports google-genai SDK v1.65+ EmbedContentResponse structure.
     Falls back to deterministic offline semantic vector if API key is not present.
     """
     client = get_gemini_client()
     if client:
         try:
             response = client.models.embed_content(
-                model="text-embedding-004",
+                model="gemini-embedding-001",
                 contents=text,
             )
-            if hasattr(response, "embedding") and response.embedding:
-                values = response.embedding.values
-                if values:
-                    return list(values)
-            elif hasattr(response, "embeddings") and response.embeddings:
-                return list(response.embeddings[0].values)
+            # Support EmbedContentResponse in google-genai SDK v1.65+
+            if hasattr(response, "embeddings") and response.embeddings:
+                first = response.embeddings[0]
+                if hasattr(first, "values") and first.values:
+                    return list(first.values)
+                if isinstance(first, (list, tuple)):
+                    return list(first)
+            elif hasattr(response, "embedding") and response.embedding:
+                emb = response.embedding
+                if hasattr(emb, "values") and emb.values:
+                    return list(emb.values)
+                if isinstance(emb, (list, tuple)):
+                    return list(emb)
         except Exception as e:
             print(f"Gemini embedding API call failed: {e}. Falling back to deterministic vector.")
 

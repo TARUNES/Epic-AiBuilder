@@ -203,7 +203,7 @@ async def analyze_sos_message(
     audio_mime: str = "audio/webm"
 ) -> Tuple[TriageExtraction, str, str]:
     """
-    Analyzes citizen SOS messages (voice audio or multilingual text) using gemini-2.5-flash.
+    Analyzes citizen SOS messages (voice audio or multilingual text) using gemini-3.8-flash (with fallback to gemini-flash-latest).
     Extracts urgency, hazard vectors, vulnerable populations, language, and safety guidance.
     """
     client = get_gemini_client()
@@ -234,15 +234,29 @@ async def analyze_sos_message(
             contents.append(text)
         contents.append(prompt)
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=TriageExtraction,
-                temperature=0.1
-            )
-        )
+        flash_models = ["gemini-3.8-flash", "gemini-flash-latest"]
+        response = None
+        last_error = None
+        for model_name in flash_models:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=TriageExtraction,
+                        temperature=0.1
+                    )
+                )
+                if response and response.text:
+                    break
+            except Exception as e:
+                last_error = e
+                print(f"{model_name} SOS analysis failed: {e}. Trying fallback model...")
+                continue
+
+        if not response or not response.text:
+            raise last_error or RuntimeError("No response returned from Gemini Flash models.")
 
         triage_data = json.loads(response.text)
         triage = TriageExtraction(**triage_data)
@@ -252,7 +266,7 @@ async def analyze_sos_message(
         return triage, detected_lang, safety
 
     except Exception as e:
-        print(f"Gemini 2.5 Flash SOS analysis failed: {e}. Using resilient fallback triage.")
+        print(f"Gemini Flash SOS analysis failed: {e}. Using resilient fallback triage.")
         return _fallback_sos_triage(raw_content or "Emergency rescue needed")
 
 async def analyze_pharmacy_pulse(
@@ -264,7 +278,7 @@ async def analyze_pharmacy_pulse(
     estimated_patient_count: Optional[int] = None
 ) -> ExtractedSignals:
     """
-    Analyzes vernacular pharmacist / clinic voice notes or text updates using gemini-2.5-flash.
+    Analyzes vernacular pharmacist / clinic voice notes or text updates using gemini-3.8-flash (with fallback to gemini-flash-latest).
     Seamlessly combines structured 1-Tap OTC Steppers with unscripted audio notes.
     """
     client = get_gemini_client()
@@ -292,15 +306,29 @@ async def analyze_pharmacy_pulse(
             contents.append(f"Structured OTC Counts: {json.dumps(otc_counts)}")
         contents.append(prompt)
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=ExtractedSignals,
-                temperature=0.1
-            )
-        )
+        flash_models = ["gemini-3.8-flash", "gemini-flash-latest"]
+        response = None
+        last_error = None
+        for model_name in flash_models:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=ExtractedSignals,
+                        temperature=0.1
+                    )
+                )
+                if response and response.text:
+                    break
+            except Exception as e:
+                last_error = e
+                print(f"{model_name} Pharmacy pulse failed: {e}. Trying fallback model...")
+                continue
+
+        if not response or not response.text:
+            raise last_error or RuntimeError("No response returned from Gemini Flash models.")
 
         data = json.loads(response.text)
         extracted = ExtractedSignals(**data)
@@ -320,7 +348,7 @@ async def analyze_pharmacy_pulse(
         return extracted
 
     except Exception as e:
-        print(f"Gemini 2.5 Flash Pharmacy pulse failed: {e}. Using resilient fallback.")
+        print(f"Gemini Flash Pharmacy pulse failed: {e}. Using resilient fallback.")
         return _fallback_pharmacy_pulse(text, otc_counts, stockouts, estimated_patient_count)
 
 
@@ -330,7 +358,7 @@ async def transcribe_audio_bytes(
     context: str = "emergency"
 ) -> str:
     """
-    Transcribes audio bytes to text using Gemini 2.5 Flash multimodal understanding.
+    Transcribes audio bytes to text using Gemini 3.8 Flash multimodal understanding (with fallback to gemini-flash-latest).
     Supports English, Tamil, Tanglish, and Hindi with high accuracy.
     Falls back gracefully if client or API key is unavailable.
     """
@@ -349,12 +377,25 @@ async def transcribe_audio_bytes(
             "Transcribe exactly what was spoken into clear, readable text. "
             "Return ONLY the transcription as plain text without conversational fillers."
         ]
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(temperature=0.0)
-        )
-        return response.text.strip()
+        flash_models = ["gemini-3.8-flash", "gemini-flash-latest"]
+        last_error = None
+        for model_name in flash_models:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=contents,
+                    config=types.GenerateContentConfig(temperature=0.0)
+                )
+                if response and response.text:
+                    return response.text.strip()
+            except Exception as e:
+                last_error = e
+                print(f"{model_name} audio transcription failed: {e}. Trying fallback model...")
+                continue
+
+        if last_error:
+            raise last_error
+
     except Exception as e:
         print(f"Audio transcription error in gemini_flash: {e}")
         if context == "pharmacy":

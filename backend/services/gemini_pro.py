@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from models.sos_schema import SOSTicket
-from models.surveillance_schema import PharmacyPulse, OutbreakAlert, MunicipalAction
+from models.surveillance_schema import PharmacyPulse, OutbreakAlert, MunicipalAction, ActionParameters, WeatherContext
 
 def get_gemini_client():
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -85,12 +85,12 @@ def _deterministic_outbreak_correlation(
             target_area="Velachery Ward 14 (4th Main & Murugu Nagar)",
             urgency="CRITICAL" if risk_prob > 0.7 else "HIGH",
             status="PENDING_APPROVAL",
-            parameters={
-                "protocol_code": "EPIDEMIC-STAGE-2-WATERBORNE",
-                "chlorination_ppm": 2.5,
-                "alert_broadcast": True,
-                "affected_population_estimate": 115000
-            }
+            parameters=ActionParameters(
+                protocol_code="EPIDEMIC-STAGE-2-WATERBORNE",
+                chlorination_ppm=2.5,
+                alert_broadcast=True,
+                affected_population_estimate=115000
+            )
         ),
         MunicipalAction(
             action_id="ACT-" + str(int(datetime.utcnow().timestamp())) + "-02",
@@ -99,11 +99,11 @@ def _deterministic_outbreak_correlation(
             target_area="4th Main Road & Murugu Nagar 2nd St",
             urgency="HIGH",
             status="PENDING_APPROVAL",
-            parameters={
-                "crew_id": "VOL-106",
-                "resource": "CHLORINATION_TANKER_5000L",
-                "priority": "P0_IMMEDIATE"
-            }
+            parameters=ActionParameters(
+                crew_id="VOL-106",
+                resource="CHLORINATION_TANKER_5000L",
+                priority="P0_IMMEDIATE"
+            )
         ),
         MunicipalAction(
             action_id="ACT-" + str(int(datetime.utcnow().timestamp())) + "-03",
@@ -112,11 +112,11 @@ def _deterministic_outbreak_correlation(
             target_area="GCC Community Health Complex & MedPlus Main",
             urgency="HIGH",
             status="PENDING_APPROVAL",
-            parameters={
-                "ors_cartons": 50,
-                "iv_fluids_rl_cases": 25,
-                "doxycycline_100mg_tabs": 2000
-            }
+            parameters=ActionParameters(
+                ors_cartons=50,
+                iv_fluids_rl_cases=25,
+                doxycycline_100mg_tabs=2000
+            )
         )
     ]
 
@@ -131,7 +131,7 @@ def _deterministic_outbreak_correlation(
         pharmacy_signal_count=pulse_count,
         recommended_municipal_actions=recommendations,
         action_proposals=actions,
-        weather_context=weather,
+        weather_context=WeatherContext(**weather) if isinstance(weather, dict) else weather,
         generated_at=datetime.utcnow().isoformat() + "Z"
     )
 
@@ -142,12 +142,12 @@ async def correlate_outbreak(
     weather: Dict[str, Any]
 ) -> OutbreakAlert:
     """
-    Executes Spatio-Temporal Epidemic Correlation using Gemini 2.5 Pro.
-    Cross-references:
-    - Phase 1 persistent environmental hazards (sewage, stagnant water, contaminated wells)
-    - Phase 2 verified pharmacy OTC telemetry spikes
-    - Real-time Open-Meteo weather factors
-    Employs Gemini Function Calling to formulate concrete Municipal Action Proposals.
+    Executes Spatio-Temporal Epidemic Correlation using Google's active Gemini models.
+    Model hierarchy:
+    1. First attempts gemini-3.1-pro-preview or gemini-pro-latest for complex causal multi-hop reasoning.
+    2. If a quota / rate limit (e.g. 429 RESOURCE_EXHAUSTED common on free-tier keys) occurs,
+       automatically falls back to gemini-3.8-flash for structured causal analysis & municipal action formulation.
+    3. If all live model attempts fail or API key is absent, falls back to deterministic offline heuristics.
     """
     client = get_gemini_client()
     if not client:
@@ -179,7 +179,7 @@ async def correlate_outbreak(
         })
 
     prompt = f"""
-You are the Chief Epidemiological Intelligence AI for EPIC-Hour running Gemini 2.5 Pro.
+You are the Chief Epidemiological Intelligence AI for EPIC-Hour.
 Analyze the two-phase crisis data for Ward: {ward_id}.
 
 Context:
@@ -196,26 +196,51 @@ Tasks:
 - Evaluate the Spatio-Temporal correlation between the persistent sewage/water contamination points and the pharmacy symptom spikes.
 - Determine the outbreak risk probability (0.0 to 1.0) and pathogen class.
 - Explain the exact causal chain reasoning connecting Phase 1 flood hazards to Phase 2 OTC medication surges.
+- Formulate concrete Municipal Action Proposals (action_proposals) with specific containment actions.
 - Return a valid JSON matching the OutbreakAlert schema.
 """
 
-    try:
-        from google.genai import types
+    models_hierarchy = ["gemini-3.1-pro-preview", "gemini-pro-latest", "gemini-3.8-flash"]
+    last_error = None
+    response = None
 
-        response = client.models.generate_content(
-            model="gemini-2.5-pro",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=OutbreakAlert,
-                temperature=0.2
+    for model_name in models_hierarchy:
+        try:
+            from google.genai import types
+
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=OutbreakAlert,
+                    temperature=0.2
+                )
             )
-        )
-        data = json.loads(response.text)
-        alert = OutbreakAlert(**data)
-        alert.weather_context = weather
-        return alert
+            if response and response.text:
+                print(f"Epidemic correlation successfully generated using model: {model_name}")
+                break
+        except Exception as e:
+            last_error = e
+            print(f"Model {model_name} correlation failed or quota exceeded ({e}). Falling back to next model...")
+            continue
 
-    except Exception as e:
-        print(f"Gemini 2.5 Pro correlation failed: {e}. Falling back to deterministic correlation.")
-        return _deterministic_outbreak_correlation(ward_id, sos_tickets, pharmacy_pulses, weather)
+    if response and response.text:
+        try:
+            data = json.loads(response.text)
+            if not data.get("alert_id"):
+                data["alert_id"] = f"EPI-2026-{int(datetime.utcnow().timestamp()) % 1000:03d}"
+            if not data.get("generated_at"):
+                data["generated_at"] = datetime.utcnow().isoformat() + "Z"
+            alert = OutbreakAlert(**data)
+            if isinstance(weather, dict):
+                alert.weather_context = WeatherContext(**weather)
+            elif weather:
+                alert.weather_context = weather
+            return alert
+        except Exception as parse_err:
+            print(f"Failed to parse live OutbreakAlert JSON: {parse_err}. Falling back to deterministic correlation.")
+            return _deterministic_outbreak_correlation(ward_id, sos_tickets, pharmacy_pulses, weather)
+
+    print(f"All Gemini correlation models exhausted ({last_error}). Using deterministic correlation fallback.")
+    return _deterministic_outbreak_correlation(ward_id, sos_tickets, pharmacy_pulses, weather)

@@ -61,6 +61,24 @@ class PharmacyPulse(BaseModel):
     raw_summary: str
     created_at: str
 
+class WeatherContext(BaseModel):
+    temperature_c: Optional[float] = Field(default=None, description="Ambient temperature in Celsius")
+    relative_humidity_pct: Optional[float] = Field(default=None, description="Relative humidity percentage")
+    precipitation_mm: Optional[float] = Field(default=None, description="Precipitation depth in mm")
+    source: Optional[str] = Field(default="Open-Meteo", description="Data source name")
+
+class ActionParameters(BaseModel):
+    protocol_code: Optional[str] = Field(default=None, description="Protocol code e.g. EPIDEMIC-STAGE-2-WATERBORNE")
+    chlorination_ppm: Optional[float] = Field(default=None, description="Target chlorination PPM")
+    alert_broadcast: Optional[bool] = Field(default=None, description="Whether alert broadcast is triggered")
+    affected_population_estimate: Optional[int] = Field(default=None, description="Estimated population impacted")
+    crew_id: Optional[str] = Field(default=None, description="Assigned response crew identifier")
+    resource: Optional[str] = Field(default=None, description="Resource dispatched")
+    priority: Optional[str] = Field(default=None, description="Dispatch priority")
+    ors_cartons: Optional[int] = Field(default=None, description="ORS cartons to restock")
+    iv_fluids_rl_cases: Optional[int] = Field(default=None, description="IV fluid cases to restock")
+    doxycycline_100mg_tabs: Optional[int] = Field(default=None, description="Doxycycline tablet count")
+
 class MunicipalAction(BaseModel):
     action_id: str
     action_type: str = Field(
@@ -71,7 +89,7 @@ class MunicipalAction(BaseModel):
     target_area: str
     urgency: str = "HIGH"
     status: str = "PENDING_APPROVAL" # PENDING_APPROVAL, APPROVED, DISPATCHED
-    parameters: Dict[str, Any] = Field(default_factory=dict)
+    parameters: Optional[ActionParameters] = Field(default_factory=ActionParameters)
     approved_by: Optional[str] = None
     approved_at: Optional[str] = None
 
@@ -86,7 +104,7 @@ class OutbreakAlert(BaseModel):
     )
     causal_chain_reasoning: str = Field(
         ...,
-        description="Gemini 2.5 Pro reasoning linking Phase 1 flood/sewage hazard pins with Phase 2 OTC pharmacy sales surge and weather"
+        description="Gemini causal reasoning linking Phase 1 flood/sewage hazard pins with Phase 2 OTC pharmacy sales surge and weather"
     )
     environmental_drivers: List[str] = Field(
         default_factory=list,
@@ -95,7 +113,7 @@ class OutbreakAlert(BaseModel):
     pharmacy_signal_count: int = 0
     recommended_municipal_actions: List[str] = Field(default_factory=list)
     action_proposals: List[MunicipalAction] = Field(default_factory=list)
-    weather_context: Optional[Dict[str, Any]] = None
+    weather_context: Optional[WeatherContext] = None
     generated_at: str
 
 class ActionApprovalRequest(BaseModel):
