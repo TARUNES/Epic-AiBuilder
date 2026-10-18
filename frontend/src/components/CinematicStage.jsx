@@ -1,13 +1,9 @@
 import React from 'react';
 import { 
-  Building2, 
   Store, 
-  MapPin, 
   ShieldAlert, 
   Compass, 
-  Radio,
-  ExternalLink,
-  ChevronRight
+  Radio
 } from 'lucide-react';
 
 export default function CinematicStage({

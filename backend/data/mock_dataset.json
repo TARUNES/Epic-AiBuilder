@@ -744,7 +744,7 @@
     "risk_probability": 0.93,
     "risk_level": "CRITICAL",
     "suspected_pathogen_class": "Waterborne Enteric (Vibrio cholerae / Acute Epidemic Gastroenteritis)",
-    "causal_chain_reasoning": "Gemini 2.5 Pro Causal Link: 8 distinct SEWAGE_OVERFLOW & CONTAMINATED_WELL disaster tickets logged during Phase 1 (Oct 15-16, centering on 4th Main Road & Murugu Nagar) are directly upstream of 5 reporting pharmacies exhibiting a 380% surge in ORS, Doxycycline, and IV fluid requests (587 presenting patients over 48 hours). Stagnant water + 88% ambient humidity has accelerated bacterial transmission in the municipal pipe network.",
+    "causal_chain_reasoning": "5 distinct sewage breach and contaminated water disaster tickets logged during Phase 1 are directly upstream of 5 reporting pharmacies exhibiting a 380% surge in ORS, Doxycycline, and rehydration requests (257 presenting patients). Stagnant water + 88% ambient humidity has accelerated bacterial transmission in the municipal pipe network.",
     "environmental_drivers": [
       "SEWAGE_OVERFLOW (7 persistent nodes)",
       "CONTAMINATED_WELL (3 community sumps)",
@@ -811,10 +811,10 @@
   "baseline_outbreak_alert_day1": {
     "alert_id": "EPI-2026-01",
     "ward_id": "WARD_14",
-    "risk_probability": 0.22,
+    "risk_probability": 0.18,
     "risk_level": "LOW",
     "suspected_pathogen_class": "Early Latent Contamination Phase (Pre-symptomatic incubation)",
-    "causal_chain_reasoning": "Active acute disaster flooding (Wave 1). Severe physical rescue bottlenecks underway with 12 active emergency tickets. Sewage overflows detected at 7 locations, creating severe prospective bio-hazard seeding, but OTC pharmacy syndromic velocity remains at baseline.",
+    "causal_chain_reasoning": "Floodwaters active; monitoring sewage breach anchors for post-flood incubation. 5 bio-hazard anchors identified during acute rescue phase. OTC pharmacy syndromic velocity remains at baseline (42 baseline patients, 0% surge).",
     "environmental_drivers": [
       "STAGNANT_FLOODWATER (Active inundation)",
       "SEWAGE_OVERFLOW (7 breach sites)",

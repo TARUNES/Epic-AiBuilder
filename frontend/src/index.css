@@ -2,42 +2,42 @@
 @import "leaflet/dist/leaflet.css";
 
 /* ==============================================================================
-   Mercury Design System Tokens — Cinematic, Serene, Humanist Editorial
+   Superhuman Design Language — Dreamy, Serene, Humanist Editorial
    ============================================================================== */
 
 :root {
   /* Surfaces */
-  --ink-950: #171721;       /* Deepest section background */
-  --ink-900: #1e1e2a;       /* Card / raised panel background */
-  --ink-800: #272735;       /* Hover fill, secondary panel */
-  --ink-tint: rgba(155, 180, 230, 0.2);  /* Ghost-button fill (periwinkle @ 20%) */
-  --ink-tint2: rgba(175, 180, 205, 0.2); /* Subtle divider wash */
+  --bg-primary: #f7f5f2;         /* Calm, warm off-white main surface */
+  --bg-surface: #f2f0eb;         /* Elevated secondary container */
+  --bg-glass: rgba(255, 255, 255, 0.72); /* Dreamy frosted glass */
+  --border-glass: rgba(255, 255, 255, 0.55);
+  --border-subtle: rgba(41, 40, 39, 0.08);
 
-  /* Text */
-  --text-primary: #ededf3;  /* Primary text on dark (near-white, cool) */
-  --text-muted: #c3c3cc;    /* Body / secondary text on dark */
-  --text-faint: #afb4cd;    /* Tertiary, captions */
+  /* Typography / Inks */
+  --ink-primary: #292827;        /* Primary ink */
+  --ink-secondary: #73736e;      /* Muted secondary text */
+  --ink-faint: #9c9b95;          /* Micro captions / hairline dividers */
 
-  /* Accent: exactly ONE saturated accent */
-  --accent-indigo: #5266eb; /* Primary accent: CTA fill, active dot, links */
-  --accent-periwinkle: #9bb4e6; /* Light accent, glow, tint base */
-  --accent-pink: #fc92b4;   /* Rare micro-accent (critical life hazards only) */
+  /* Superhuman Accents */
+  --accent-indigo: #1b1938;       /* Deep indigo primary CTA fill */
+  --accent-lavender: #d4c7ff;     /* Soft lavender active pill / secondary CTA */
+  --accent-purple-grad-start: #a8a4d8;
+  --accent-purple-grad-end: #b070c0;
+  --accent-teal: #027e6f;         /* Rare semantic accent: verified clinic / health */
 
-  /* Hairlines & Radii */
-  --hairline: rgba(175, 180, 205, 0.15);
-  --hairline-strong: rgba(175, 180, 205, 0.28);
-  --radius-card: 12px;
-  --radius-small: 4px;
+  /* Shadows */
+  --shadow-ambient: 0 8px 24px rgba(41, 40, 39, 0.06);
+  --shadow-glass: 0 12px 32px rgba(27, 25, 56, 0.08);
 }
 
 @layer base {
   body {
     margin: 0;
     padding: 0;
-    background-color: var(--ink-950);
-    color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-weight: 420;
+    background-color: var(--bg-primary);
+    color: var(--ink-primary);
+    font-family: 'Plus Jakarta Sans', 'Inter Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 460;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -48,13 +48,13 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: var(--ink-950);
+    background-color: var(--bg-primary);
   }
 
-  h1, h2, h3, h4 {
-    color: var(--text-primary);
-    font-weight: 480;
-    letter-spacing: 0.015em;
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--ink-primary);
+    font-weight: 540;
+    letter-spacing: -0.02em;
   }
 
   :focus-visible {
@@ -63,96 +63,192 @@
   }
 }
 
-/* Hairline Panels (No heavy drop shadows, calm flat dark depth) */
-.mercury-panel {
-  background-color: var(--ink-900);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-card);
+/* Superhuman Hero Opening Canvas */
+.superhuman-hero-canvas {
+  background-image: linear-gradient(
+      to left bottom,
+      rgba(168, 164, 216, 0.5),
+      rgba(107, 165, 232, 0.5),
+      rgba(176, 112, 192, 0.6),
+      rgba(144, 136, 208, 0.5)
+    ),
+    url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=80');
+  background-size: cover;
+  background-position: center;
 }
 
-.mercury-panel-hover:hover {
-  background-color: var(--ink-800);
-  border-color: var(--hairline-strong);
+/* Floating Glass UI Cards */
+.superhuman-glass-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 12px 32px rgba(27, 25, 56, 0.08);
 }
 
-.mercury-hairline {
-  border-color: var(--hairline);
+/* Main Content Warm Surface Container */
+.superhuman-card {
+  background: var(--bg-surface);
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-ambient);
 }
 
-/* Buttons */
-.mercury-btn-primary {
-  background-color: var(--accent-indigo);
+/* Typography Classes */
+.superhuman-headline {
+  font-family: 'Plus Jakarta Sans', 'Inter Variable', -apple-system, sans-serif;
+  font-weight: 540;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  color: #292827;
+}
+
+.superhuman-subhead {
+  font-weight: 460;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+}
+
+/* Primary CTA Button: Deep-indigo pill with purple-gradient arrow chip */
+.superhuman-btn-primary {
+  background: #1b1938;
   color: #ffffff;
-  border-radius: 9999px;
-  height: 40px;
-  padding: 0 20px;
-  font-weight: 420;
-  font-size: 15px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.mercury-btn-primary:hover {
-  background-color: #4354d0;
-}
-
-.mercury-btn-ghost {
-  background-color: var(--ink-tint);
-  color: var(--text-primary);
-  border-radius: 9999px;
-  height: 40px;
-  padding: 0 18px;
-  font-weight: 420;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.mercury-btn-ghost:hover {
-  background-color: rgba(155, 180, 230, 0.32);
-}
-
-/* Capsule Inputs */
-.mercury-input-pill {
-  height: 46px;
-  background-color: transparent;
-  border: 1px solid var(--hairline);
-  border-radius: 9999px;
-  color: var(--text-primary);
-  padding: 0 18px;
-  font-size: 15px;
-  font-weight: 420;
-  transition: border-color 0.2s ease;
-}
-.mercury-input-pill:focus {
-  outline: none;
-  border-color: var(--accent-indigo);
-}
-.mercury-input-pill::placeholder {
-  color: var(--text-faint);
-  opacity: 0.65;
-}
-
-/* Leaflet integration with dark theme */
-.leaflet-container {
-  background-color: var(--ink-950) !important;
-  font-family: inherit !important;
+  height: 50px;
   border-radius: 12px;
+  padding: 0 22px;
+  box-shadow: 0 1px 2px rgba(20, 20, 19, 0.24), inset 0 0 0 1px #353088;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.superhuman-btn-primary:hover:not(:disabled) {
+  background: #27244e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(27, 25, 56, 0.25), inset 0 0 0 1px #4e48b8;
+}
+
+.superhuman-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.superhuman-btn-primary:disabled {
+  opacity: 0.92;
+  cursor: not-allowed;
+}
+
+/* Purple-gradient arrow chip inside Primary CTA button */
+.superhuman-arrow-chip {
+  background: linear-gradient(135deg, #a8a4d8, #b070c0);
+  border-radius: 6px;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Secondary CTA / Active Pill */
+.superhuman-pill-active {
+  background: #d4c7ff;
+  color: #1b1938;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.superhuman-pill-inactive {
+  background: transparent;
+  color: #73736e;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.superhuman-pill-inactive:hover {
+  color: #292827;
+  background: rgba(212, 199, 255, 0.2);
+}
+
+/* Rare Semantic Accent (Teal) */
+.superhuman-badge-teal {
+  background: rgba(2, 126, 111, 0.1);
+  color: #027e6f;
+  border: 1px solid rgba(2, 126, 111, 0.2);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Form Input Elements */
+.superhuman-input {
+  background: #ffffff;
+  border: 1px solid rgba(41, 40, 39, 0.12);
+  border-radius: 12px;
+  color: #292827;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.superhuman-input:focus {
+  outline: none;
+  border-color: #1b1938;
+  box-shadow: 0 0 0 3px rgba(212, 199, 255, 0.45);
+}
+
+/* Leaflet integration with Superhuman aesthetics */
+.leaflet-container {
+  background-color: #f2f0eb !important;
+  font-family: inherit !important;
+  border-radius: 16px;
 }
 
 .leaflet-control-zoom {
-  border: none !important;
-  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(27, 25, 56, 0.08) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
 }
 
 .leaflet-control-zoom a {
-  background-color: var(--ink-900) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--hairline) !important;
+  background-color: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #292827 !important;
+  border-bottom: 1px solid rgba(41, 40, 39, 0.08) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #ffffff !important;
+  color: #1b1938 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

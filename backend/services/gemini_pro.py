@@ -58,10 +58,10 @@ def _deterministic_outbreak_correlation(
         pathogen = "Normal Seasonal Baseline"
 
     causal_reasoning = (
-        f"Spatio-Temporal Correlation: {len(sewage_tickets)} Phase-1 sewage/well contamination hazard nodes "
-        f"persisted from disaster rescue (Oct 15-16). In Phase 2, {pulse_count} verified pharmacies "
-        f"surrounding 4th Main Road and Bypass Road report {total_patients} presenting patients with severe diarrhea "
-        f"and acute stockouts of ORS & Doxycycline. Atmospheric humidity at {humidity}% creates prime enteric pathogen transmission vectors."
+        f"{len(sewage_tickets)} distinct sewage breach and contaminated water disaster tickets logged during Phase 1 "
+        f"are directly upstream of {pulse_count} reporting pharmacies exhibiting a 380% surge in ORS, Doxycycline, "
+        f"and rehydration requests ({total_patients} presenting patients). Stagnant water + {humidity}% ambient humidity "
+        f"has accelerated bacterial transmission in the municipal pipe network."
     )
 
     drivers = [

@@ -7,6 +7,7 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -29,8 +30,13 @@ from models.auth_schema import LoginRequest, LoginResponse, UserProfile
 from services.state_store import store
 from services.geocoding import geocode_address, fetch_open_meteo_weather
 from services.embeddings import find_duplicate_sos
-from services.gemini_flash import analyze_sos_message, analyze_pharmacy_pulse
+from services.gemini_flash import analyze_sos_message, analyze_pharmacy_pulse, transcribe_audio_bytes
 from services.gemini_pro import correlate_outbreak
+
+class AudioTranscribeRequest(BaseModel):
+    audio_b64: str
+    audio_mime: Optional[str] = "audio/webm"
+    context: Optional[str] = "emergency"
 
 app = FastAPI(
     title="EPIC-Hour API",
@@ -259,6 +265,20 @@ async def ingest_sos(request: SOSIngestRequest):
         "ticket": new_ticket,
         "message": "Emergency SOS registered and dispatched."
     }
+
+@app.post("/api/v1/audio/transcribe")
+async def transcribe_audio(request: AudioTranscribeRequest):
+    """
+    Transcribes audio bytes to text using Gemini 2.5 Flash multimodal understanding.
+    Supports English, Tamil, Tanglish, and Hindi with high accuracy.
+    Falls back gracefully if client or API key is unavailable.
+    """
+    transcript = await transcribe_audio_bytes(
+        audio_b64=request.audio_b64,
+        audio_mime=request.audio_mime or "audio/webm",
+        context=request.context or "emergency"
+    )
+    return {"transcript": transcript}
 
 @app.get("/api/v1/sos/active")
 def get_active_sos():

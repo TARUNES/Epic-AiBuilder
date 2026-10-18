@@ -4,7 +4,6 @@ import {
   LifeBuoy, 
   Droplets, 
   X,
-  Layers,
   MapPin,
   AlertTriangle,
   Clock,
@@ -12,7 +11,6 @@ import {
 } from 'lucide-react';
 import { MapContainer, TileLayer, Circle, CircleMarker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
-import { MAP_PROVIDERS, DEFAULT_PROVIDER, getMapProvider } from '../lib/mapProviders';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -21,7 +19,8 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-const VELACHERY_CENTER = [12.9775, 80.2212];
+// Ward 14 Velachery Canonical Center
+const VELACHERY_CENTER = [12.9756, 80.2207];
 
 const HAZARD_NAMES = {
   SEWAGE_OVERFLOW: 'Sewage Overflow Breach',
@@ -44,34 +43,23 @@ export default function EpicHourMap({
   tickets = [],
   facilities = [],
   volunteers = [],
-  pulses = [],
-  provider = DEFAULT_PROVIDER,
-  onSelectTicket
+  pulses = []
 }) {
-  const [selectedProvider, setSelectedProvider] = useState(provider);
-  const [showProviderMenu, setShowProviderMenu] = useState(false);
-
-  // Phase-aware intelligent layer defaults:
-  // Phase 1 (Flood/Acute): Volunteers & SOS tickets front-and-center, hazards secondary
-  // Phase 2 (Surveillance): Hazard anchors & Pharmacy syndromic pulses front-and-center
+  // Layer toggles
   const [showHazards, setShowHazards] = useState(phase === 2);
   const [showFacilities, setShowFacilities] = useState(true);
   const [showVolunteers, setShowVolunteers] = useState(phase === 1);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [prevPhase, setPrevPhase] = useState(phase);
 
-  // Sync layer toggles automatically when phase changes
-  useEffect(() => {
-    if (phase === 1) {
-      setShowVolunteers(true);
-      setShowHazards(false);
-      setShowFacilities(true);
-    } else {
-      setShowVolunteers(false);
-      setShowHazards(true);
-      setShowFacilities(true);
-    }
+  // Sync layer toggles automatically when phase changes without cascading renders
+  if (phase !== prevPhase) {
+    setPrevPhase(phase);
+    setShowVolunteers(phase === 1);
+    setShowHazards(phase === 2);
+    setShowFacilities(true);
     setSelectedItem(null);
-  }, [phase]);
+  }
 
   // Close drawer on Escape
   useEffect(() => {
@@ -82,10 +70,6 @@ export default function EpicHourMap({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const currentTileConfig = useMemo(() => {
-    return getMapProvider(selectedProvider);
-  }, [selectedProvider]);
-
   const hazardNodes = useMemo(() => {
     return tickets.filter(
       (t) => t.triage?.environmental_hazard_logged?.length > 0
@@ -93,88 +77,49 @@ export default function EpicHourMap({
   }, [tickets]);
 
   return (
-    <div className="relative w-full h-[540px] sm:h-[600px] rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-slate-100 flex flex-col">
+    <div className="relative w-full h-[540px] sm:h-[600px] rounded-2xl overflow-hidden border border-black/[0.08] shadow-sm bg-[#f2f0eb] flex flex-col">
       
       {/* Top Map Controls Overlay */}
       <div className="absolute top-3.5 left-3.5 right-3.5 z-[1000] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         
-        {/* Left Badge: Ward Location & Mode Badge */}
-        <div className="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-sm text-xs">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-          <span className="font-extrabold text-slate-900">Ward 14 Velachery</span>
-          <span className="text-slate-500 font-medium hidden sm:inline">
+        {/* Left Badge: Location & Mode Badge */}
+        <div className="pointer-events-auto superhuman-glass-card px-3.5 py-1.5 flex items-center gap-2 text-xs text-[#292827]">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#027e6f] animate-pulse" />
+          <span className="font-semibold text-[#292827]">Active Operational Grid</span>
+          <span className="text-[#73736e] font-normal hidden sm:inline">
             · {phase === 1 ? `${tickets.length} Rescue Incidents` : `${pulses.length} Clinic Pulses`}
           </span>
         </div>
 
-        {/* Right Controls: Tile Provider Switcher & Clean Layer Toggles */}
-        <div className="pointer-events-auto flex items-center gap-1.5 bg-white/95 backdrop-blur-sm p-1 rounded-xl border border-slate-200 shadow-sm text-xs">
+        {/* Right Controls: Only clean Bio-Hazards and Clinics layer toggles */}
+        <div className="pointer-events-auto superhuman-glass-card p-1 flex items-center gap-1.5 text-xs">
           
-          {/* Provider Selection Dropdown Button */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowProviderMenu(!showProviderMenu)}
-              title="Change Map Tile Provider"
-              className="px-2.5 py-1 rounded-lg font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all flex items-center gap-1 border border-transparent hover:border-slate-200"
-            >
-              <Layers className="w-3.5 h-3.5 text-slate-600" />
-              <span className="hidden md:inline">{currentTileConfig.name.split(' ')[0]}</span>
-            </button>
-
-            {showProviderMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-xl border border-slate-200 shadow-lg py-1 z-[1100] text-xs">
-                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  OpenStreetMap Layers
-                </div>
-                {Object.values(MAP_PROVIDERS).map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedProvider(p.id);
-                      setShowProviderMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 font-medium flex items-center justify-between hover:bg-slate-50 ${
-                      selectedProvider === p.id ? 'text-blue-700 bg-blue-50/60 font-bold' : 'text-slate-700'
-                    }`}
-                  >
-                    <span>{p.name}</span>
-                    {selectedProvider === p.id && <span className="text-blue-600 text-[10px]">●</span>}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="w-px h-4 bg-slate-200 mx-0.5" />
-
-          {/* Layer: Hazards */}
+          {/* Layer: Bio-Hazards */}
           <button
             type="button"
             onClick={() => setShowHazards(!showHazards)}
-            className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${
               showHazards 
-                ? 'bg-purple-50 text-purple-800 border border-purple-200' 
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'superhuman-pill-active !py-1 !px-2.5 shadow-xs' 
+                : 'text-[#73736e] hover:text-[#292827]'
             }`}
           >
-            <Droplets className="w-3.5 h-3.5 text-purple-600" />
-            <span className="hidden sm:inline">Bio-Hazards</span>
+            <Droplets className="w-3.5 h-3.5 text-[#b070c0]" />
+            <span>Bio-Hazards</span>
           </button>
 
-          {/* Layer: Healthcare Partners */}
+          {/* Layer: Clinics */}
           <button
             type="button"
             onClick={() => setShowFacilities(!showFacilities)}
-            className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${
               showFacilities 
-                ? 'bg-teal-50 text-teal-800 border border-teal-200' 
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'superhuman-pill-active !py-1 !px-2.5 shadow-xs' 
+                : 'text-[#73736e] hover:text-[#292827]'
             }`}
           >
-            <Store className="w-3.5 h-3.5 text-teal-600" />
-            <span className="hidden sm:inline">Clinics</span>
+            <Store className="w-3.5 h-3.5 text-[#027e6f]" />
+            <span>Clinics</span>
           </button>
 
           {/* Layer: Responders (Phase 1 focus) */}
@@ -182,33 +127,31 @@ export default function EpicHourMap({
             <button
               type="button"
               onClick={() => setShowVolunteers(!showVolunteers)}
-              className={`px-2.5 py-1 rounded-lg font-bold transition-all flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${
                 showVolunteers 
-                  ? 'bg-blue-50 text-blue-800 border border-blue-200' 
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'superhuman-pill-active !py-1 !px-2.5 shadow-xs' 
+                  : 'text-[#73736e] hover:text-[#292827]'
               }`}
             >
-              <LifeBuoy className="w-3.5 h-3.5 text-blue-600" />
-              <span className="hidden sm:inline">Responders</span>
+              <LifeBuoy className="w-3.5 h-3.5 text-[#6ba5e8]" />
+              <span>Responders</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Map Container using Provider-Agnostic Tile Adapter */}
+      {/* Map Container using OpenStreetMap Standard */}
       <MapContainer
-        key={currentTileConfig.id}
+        key="osm-standard-map"
         center={VELACHERY_CENTER}
         zoom={14}
         scrollWheelZoom={true}
         className="w-full h-full z-0"
       >
         <TileLayer
-          key={currentTileConfig.url}
-          attribution={currentTileConfig.attribution}
-          url={currentTileConfig.url}
-          maxZoom={currentTileConfig.maxZoom}
-          subdomains={currentTileConfig.subdomains}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
 
         {/* PHASE 1: Active Rescue Incident Markers */}
@@ -216,7 +159,7 @@ export default function EpicHourMap({
           tickets.map((t) => {
             const urgency = t.triage?.urgency_score || 5;
             const isCritical = urgency >= 9.0;
-            const fillColor = isCritical ? '#dc2626' : urgency >= 7.5 ? '#d97706' : '#2563eb';
+            const fillColor = isCritical ? '#dc2626' : urgency >= 7.5 ? '#d97706' : '#1b1938';
 
             return (
               <CircleMarker
@@ -239,12 +182,12 @@ export default function EpicHourMap({
                 <Tooltip direction="top" offset={[0, -6]} opacity={0.95}>
                   <div className="text-xs font-sans">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900">#{t.ticket_id}</span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-red-100 text-red-800">
+                      <span className="font-bold text-[#292827]">#{t.ticket_id}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-800">
                         P{urgency}/10
                       </span>
                     </div>
-                    <div className="font-semibold text-slate-700 mt-0.5">
+                    <div className="font-medium text-[#73736e] mt-0.5">
                       {CATEGORY_NAMES[t.triage?.category] || t.triage?.category}
                     </div>
                   </div>
@@ -261,9 +204,9 @@ export default function EpicHourMap({
                 center={[t.location.lat, t.location.lng]}
                 radius={160}
                 pathOptions={{
-                  color: '#9333ea',
-                  fillColor: '#a855f7',
-                  fillOpacity: 0.15,
+                  color: '#b070c0',
+                  fillColor: '#d4c7ff',
+                  fillOpacity: 0.35,
                   weight: 1.5,
                   dashArray: '4, 4',
                 }}
@@ -273,7 +216,7 @@ export default function EpicHourMap({
                 radius={7}
                 pathOptions={{
                   color: '#ffffff',
-                  fillColor: '#7e22ce',
+                  fillColor: '#8a4ea8',
                   fillOpacity: 0.95,
                   weight: 2,
                 }}
@@ -283,10 +226,10 @@ export default function EpicHourMap({
               >
                 <Tooltip direction="top" offset={[0, -6]}>
                   <div className="text-xs font-sans">
-                    <span className="text-[10px] font-bold text-purple-700 block uppercase">
+                    <span className="text-[10px] font-bold text-[#8a4ea8] block uppercase">
                       Bio-Hazard Anchor
                     </span>
-                    <span className="font-bold text-slate-900">
+                    <span className="font-semibold text-[#292827]">
                       {t.triage?.environmental_hazard_logged?.map((h) => HAZARD_NAMES[h] || h).join(', ')}
                     </span>
                   </div>
@@ -328,7 +271,7 @@ export default function EpicHourMap({
                 >
                   <Tooltip direction="top" offset={[0, -8]}>
                     <div className="text-xs font-sans">
-                      <span className="font-bold text-slate-900 block">{p.facility_name}</span>
+                      <span className="font-bold text-[#292827] block">{p.facility_name}</span>
                       <div className="text-[11px] font-semibold text-rose-700 mt-0.5">
                         {p.extracted_signals?.estimated_patient_count} presenting patients
                       </div>
@@ -348,7 +291,7 @@ export default function EpicHourMap({
               radius={6}
               pathOptions={{
                 color: '#ffffff',
-                fillColor: '#059669',
+                fillColor: '#027e6f',
                 fillOpacity: 0.95,
                 weight: 1.5,
               }}
@@ -358,8 +301,8 @@ export default function EpicHourMap({
             >
               <Tooltip direction="bottom" offset={[0, 6]}>
                 <div className="text-xs font-sans">
-                  <span className="font-bold text-slate-900 block">{fac.facility_name}</span>
-                  <span className="text-[10px] text-slate-500">Verified Healthcare Partner</span>
+                  <span className="font-semibold text-[#292827] block">{fac.facility_name}</span>
+                  <span className="text-[10px] text-[#027e6f]">Verified Healthcare Partner</span>
                 </div>
               </Tooltip>
             </CircleMarker>
@@ -374,7 +317,7 @@ export default function EpicHourMap({
               radius={6}
               pathOptions={{
                 color: '#ffffff',
-                fillColor: '#2563eb',
+                fillColor: '#1b1938',
                 fillOpacity: 0.95,
                 weight: 1.5,
               }}
@@ -384,8 +327,8 @@ export default function EpicHourMap({
             >
               <Tooltip direction="bottom" offset={[0, 6]}>
                 <div className="text-xs font-sans">
-                  <span className="font-bold text-slate-900 block">{vol.name}</span>
-                  <span className="text-[10px] text-slate-500">Rescue Squad</span>
+                  <span className="font-semibold text-[#292827] block">{vol.name}</span>
+                  <span className="text-[10px] text-[#73736e]">Field Rescue Unit</span>
                 </div>
               </Tooltip>
             </CircleMarker>
@@ -393,56 +336,56 @@ export default function EpicHourMap({
       </MapContainer>
 
       {/* Map Legend */}
-      <div className="bg-white border-t border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
+      <div className="bg-[#f2f0eb] border-t border-black/[0.06] px-4 py-2.5 flex flex-wrap items-center justify-between text-xs text-[#73736e] gap-2">
         <div className="flex items-center gap-4">
           {phase === 1 ? (
             <>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
-                <span>P0 Evacuation</span>
+                <span className="text-[#292827] font-medium">P0 Evacuation</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span>Flood Rescue</span>
+                <span className="text-[#292827] font-medium">Flood Rescue</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
-                <span>Rescue Unit</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1b1938]" />
+                <span className="text-[#292827] font-medium">Rescue Unit</span>
               </div>
             </>
           ) : (
             <>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
-                <span>Medication Surge</span>
+                <span className="text-[#292827] font-medium">Medication Surge</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-700" />
-                <span>Sewage Breach Anchor</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#8a4ea8]" />
+                <span className="text-[#292827] font-medium">Sewage Breach Anchor</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-                <span>Verified Clinic</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#027e6f]" />
+                <span className="text-[#292827] font-medium">Verified Clinic</span>
               </div>
             </>
           )}
         </div>
 
-        <div className="text-[11px] text-slate-400 font-medium">
-          {currentTileConfig.name} · Velachery Ward 14
+        <div className="text-[11px] text-[#73736e]">
+          OpenStreetMap Standard · Live Geospatial Grid
         </div>
       </div>
 
       {/* Clean Slide-in Detail Drawer on Right */}
       {selectedItem && (
-        <div className="absolute top-14 right-3.5 bottom-12 w-80 z-[1050] bg-white/95 backdrop-blur-md rounded-2xl border border-slate-300 p-4 shadow-xl text-xs space-y-3 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-200">
+        <div className="absolute top-14 right-3.5 bottom-12 w-80 z-[1050] superhuman-glass-card !bg-white/95 p-4 shadow-xl text-xs space-y-3 flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-200">
           <div className="space-y-3">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-2.5">
+            <div className="flex items-start justify-between border-b border-black/[0.08] pb-2.5">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-[#73736e] uppercase tracking-wider block">
                   {selectedItem.type.replace('_', ' ')}
                 </span>
-                <span className="font-extrabold text-slate-900 text-sm">
+                <span className="font-semibold text-[#292827] text-sm">
                   {selectedItem.type === 'SOS_TICKET' && `Incident #${selectedItem.data.ticket_id}`}
                   {selectedItem.type === 'PHARMACY_PULSE' && selectedItem.data.facility_name}
                   {selectedItem.type === 'FACILITY' && selectedItem.data.facility_name}
@@ -453,44 +396,44 @@ export default function EpicHourMap({
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className="p-1 rounded-lg text-[#73736e] hover:text-[#292827] hover:bg-black/[0.05] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {selectedItem.type === 'SOS_TICKET' && (
-              <div className="space-y-2.5 text-slate-700">
+              <div className="space-y-2.5 text-[#292827]">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-500">Urgency Priority</span>
+                  <span className="text-[#73736e]">Urgency Priority</span>
                   <span className={`px-2 py-0.5 rounded font-bold font-mono text-[11px] ${
                     selectedItem.data.triage?.urgency_score >= 9.0 
-                      ? 'bg-red-100 text-red-800' 
+                      ? 'bg-rose-100 text-rose-800' 
                       : 'bg-amber-100 text-amber-800'
                   }`}>
                     {selectedItem.data.triage?.urgency_score} / 10
                   </span>
                 </div>
                 <div>
-                  <span className="font-semibold text-slate-500 block mb-0.5">Category</span>
-                  <span className="px-2 py-0.5 bg-slate-100 text-slate-800 rounded font-medium inline-block">
+                  <span className="text-[#73736e] block mb-0.5">Category</span>
+                  <span className="px-2 py-0.5 bg-[#f2f0eb] text-[#292827] rounded font-medium inline-block">
                     {CATEGORY_NAMES[selectedItem.data.triage?.category] || selectedItem.data.triage?.category}
                   </span>
                 </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-slate-800 text-xs">
+                <div className="p-2.5 bg-[#f7f5f2] rounded-xl border border-black/[0.06] text-[#292827] text-xs">
                   "{selectedItem.data.raw_input}"
                 </div>
-                <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <div className="flex items-center gap-1.5 text-[#73736e] text-[11px]">
+                  <MapPin className="w-3.5 h-3.5 text-[#73736e] shrink-0" />
                   <span>{selectedItem.data.location?.address}</span>
                 </div>
                 {selectedItem.data.assigned_volunteer_name && (
-                  <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-xl text-blue-900">
-                    <div className="flex items-center gap-1 font-bold">
-                      <LifeBuoy className="w-3.5 h-3.5 text-blue-600" />
+                  <div className="p-2.5 bg-[#d4c7ff]/30 border border-[#d4c7ff] rounded-xl text-[#1b1938]">
+                    <div className="flex items-center gap-1 font-semibold">
+                      <LifeBuoy className="w-3.5 h-3.5 text-[#1b1938]" />
                       <span>{selectedItem.data.assigned_volunteer_name}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-blue-700 mt-1">
+                    <div className="flex items-center gap-1 text-[11px] text-[#1b1938]/80 mt-1">
                       <Clock className="w-3 h-3" />
                       <span>ETA ~{selectedItem.data.assigned_volunteer_eta_minutes} mins</span>
                     </div>
@@ -500,17 +443,17 @@ export default function EpicHourMap({
             )}
 
             {selectedItem.type === 'HAZARD' && (
-              <div className="space-y-2.5 text-slate-700">
-                <div className="p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-purple-900">
-                  <div className="font-bold flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-purple-600" />
+              <div className="space-y-2.5 text-[#292827]">
+                <div className="p-2.5 bg-[#d4c7ff]/30 border border-[#d4c7ff] rounded-xl text-[#1b1938]">
+                  <div className="font-semibold flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-[#b070c0]" />
                     <span>Active Hazard Log</span>
                   </div>
-                  <p className="text-xs text-purple-800 mt-1">
+                  <p className="text-xs text-[#292827] mt-1">
                     {selectedItem.data.triage?.environmental_hazard_logged?.map((h) => HAZARD_NAMES[h] || h).join(', ')}
                   </p>
                 </div>
-                <div className="text-[11px] text-slate-500 space-y-1">
+                <div className="text-[11px] text-[#73736e] space-y-1">
                   <div>Originating SOS: #{selectedItem.data.ticket_id}</div>
                   <div>Location: {selectedItem.data.location?.address}</div>
                 </div>
@@ -518,15 +461,15 @@ export default function EpicHourMap({
             )}
 
             {selectedItem.type === 'PHARMACY_PULSE' && (
-              <div className="space-y-2.5 text-slate-700">
+              <div className="space-y-2.5 text-[#292827]">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-500">Presenting Patients (24h)</span>
+                  <span className="text-[#73736e]">Presenting Patients (24h)</span>
                   <strong className="text-rose-600 text-sm">
                     {selectedItem.data.extracted_signals?.estimated_patient_count}
                   </strong>
                 </div>
                 <div>
-                  <span className="font-semibold text-slate-500 block mb-1">Spiking Medications</span>
+                  <span className="text-[#73736e] block mb-1">Spiking Medications</span>
                   <div className="flex flex-wrap gap-1">
                     {selectedItem.data.extracted_signals?.medications_spiking?.map((med) => (
                       <span key={med} className="px-2 py-0.5 bg-rose-50 text-rose-800 border border-rose-200 rounded font-semibold text-[10px]">
@@ -541,37 +484,37 @@ export default function EpicHourMap({
                     {selectedItem.data.extracted_signals.stockout_warning.join(', ')}
                   </div>
                 )}
-                <div className="p-2 bg-slate-50 rounded-lg text-slate-600 text-xs">
+                <div className="p-2 bg-[#f7f5f2] rounded-lg text-[#73736e] text-xs">
                   {selectedItem.data.raw_summary}
                 </div>
               </div>
             )}
 
             {selectedItem.type === 'FACILITY' && (
-              <div className="space-y-2 text-slate-700">
-                <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <div className="space-y-2 text-[#292827]">
+                <div className="flex items-center gap-1.5 text-[#027e6f] font-semibold">
+                  <ShieldCheck className="w-4 h-4 text-[#027e6f]" />
                   <span>Verified Healthcare Node</span>
                 </div>
-                <div className="text-slate-600 text-xs">
+                <div className="text-[#73736e] text-xs">
                   {selectedItem.data.location?.address}
                 </div>
-                <div className="text-[11px] text-slate-500">
+                <div className="text-[11px] text-[#73736e]">
                   Contact: {selectedItem.data.contact_person}
                 </div>
               </div>
             )}
 
             {selectedItem.type === 'VOLUNTEER' && (
-              <div className="space-y-2 text-slate-700">
+              <div className="space-y-2 text-[#292827]">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Capabilities</span>
-                  <span className="font-mono text-[10px] font-bold bg-blue-50 text-blue-800 px-2 py-0.5 rounded">
+                  <span className="text-[#73736e]">Capabilities</span>
+                  <span className="font-mono text-[10px] font-bold bg-[#d4c7ff]/40 text-[#1b1938] px-2 py-0.5 rounded">
                     {selectedItem.data.capabilities}
                   </span>
                 </div>
-                <div className="text-xs text-slate-600">
-                  Status: <strong className={selectedItem.data.available ? 'text-emerald-600' : 'text-slate-500'}>
+                <div className="text-xs text-[#73736e]">
+                  Status: <strong className={selectedItem.data.available ? 'text-[#027e6f]' : 'text-[#73736e]'}>
                     {selectedItem.data.available ? 'Ready for Deployment' : 'Active on Field'}
                   </strong>
                 </div>
@@ -579,7 +522,7 @@ export default function EpicHourMap({
             )}
           </div>
 
-          <div className="pt-2 border-t border-slate-100 text-[10px] text-slate-400 text-center">
+          <div className="pt-2 border-t border-black/[0.08] text-[10px] text-[#73736e] text-center">
             Press ESC or click map to close
           </div>
         </div>

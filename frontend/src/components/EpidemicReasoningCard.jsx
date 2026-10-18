@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle, 
-  Activity,
-  Droplets, 
-  Send
+  ArrowRight 
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -14,20 +12,41 @@ const ACTION_TYPE_LABELS = {
   dispatch_chlorination_tanker: 'Mobile Water Tanker Deployment'
 };
 
+const DAY_1_PREVENTIVE_ACTIONS = [
+  {
+    action_id: 'ACT-DAY1-01',
+    action_type: 'dispatch_volunteer_resource',
+    title: 'Deploy Water Purification Sachets & Rations with Rescue Boats',
+    target_area: 'Inundated 4th Main Road & Murugu Nagar',
+    urgency: 'HIGH',
+    status: 'APPROVED',
+    approved_by: 'Chief Municipal Health Officer'
+  },
+  {
+    action_id: 'ACT-DAY1-02',
+    action_type: 'trigger_municipal_containment_protocol',
+    title: 'Log & Geotag Sewage Breach Coordinates for Post-Flood Chlorination',
+    target_area: 'All Phase 1 Active Hazard Anchors',
+    urgency: 'HIGH',
+    status: 'APPROVED',
+    approved_by: 'Disaster Cell Incident Commander'
+  }
+];
+
 export default function EpidemicReasoningCard({ 
   alert, 
+  simulatedDay = 1,
+  isWave2 = false,
+  totalBioHazardCount = 5,
+  activeClinicCount = 5,
+  totalPresentingPatients = 257,
+  surgePercent = 380,
   onActionApproved
 }) {
   const [approvingActionId, setApprovingActionId] = useState(null);
 
-  if (!alert) {
-    return (
-      <div className="mercury-panel p-6 text-center text-[#afb4cd] space-y-2">
-        <Activity className="w-5 h-5 mx-auto text-[#5266eb] animate-spin" />
-        <p className="text-xs font-light">Correlating flood and syndromic telemetry...</p>
-      </div>
-    );
-  }
+  const isDay1Baseline = simulatedDay === 1 && !isWave2;
+  const isCritical = !isDay1Baseline && (alert ? alert.risk_probability >= 0.8 : true);
 
   const handleApprove = async (actionId) => {
     setApprovingActionId(actionId);
@@ -47,83 +66,128 @@ export default function EpidemicReasoningCard({
     }
   };
 
-  const isCritical = alert.risk_probability >= 0.8;
+  // Single source of truth dynamically constructed reasoning paragraph
+  const dynamicReasoningParagraph = isDay1Baseline
+    ? `Floodwaters active; monitoring sewage breach anchors for post-flood incubation. ${totalBioHazardCount} bio-hazard anchors identified during acute rescue phase. OTC pharmacy syndromic velocity remains at baseline (${totalPresentingPatients} baseline patients, 0% surge).`
+    : `${totalBioHazardCount} distinct sewage breach and contaminated water disaster tickets logged during Phase 1 are directly upstream of ${activeClinicCount} reporting pharmacies exhibiting a ${surgePercent}% surge in ORS, Doxycycline, and rehydration requests (${totalPresentingPatients} presenting patients). Stagnant water and elevated ambient humidity have accelerated bacterial transmission in the municipal pipe network.`;
+
+  const actionsList = isDay1Baseline 
+    ? DAY_1_PREVENTIVE_ACTIONS 
+    : (alert?.action_proposals && alert.action_proposals.length > 0 
+        ? alert.action_proposals 
+        : [
+            {
+              action_id: 'ACT-01',
+              title: 'Emergency Superchlorination of Affected Low-Lying Sump Lines',
+              action_type: 'trigger_municipal_containment_protocol',
+              target_area: 'Low-Lying Inundated Residential Sectors',
+              status: 'PENDING_APPROVAL',
+              urgency: 'HIGH'
+            },
+            {
+              action_id: 'ACT-02',
+              title: 'Immediate ORS & Doxycycline Emergency Depot Restock',
+              action_type: 'restock_medical_inventory',
+              target_area: 'Regional Primary Health Centers & Key Pharmacies',
+              status: 'PENDING_APPROVAL',
+              urgency: 'CRITICAL'
+            },
+            {
+              action_id: 'ACT-03',
+              title: 'Mobile Potable Water Tanker Deployment (10 Units)',
+              action_type: 'dispatch_chlorination_tanker',
+              target_area: 'Inundated Community Sectors',
+              status: 'PENDING_APPROVAL',
+              urgency: 'HIGH'
+            }
+          ]);
 
   return (
-    <div className="mercury-panel p-6 space-y-6 text-[#ededf3]">
+    <div className="superhuman-card p-6 space-y-6 text-[#292827]">
       
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-[rgba(175,180,205,0.12)] pb-4">
+      {/* Header: Clean, uncluttered with exact logical Risk status */}
+      <div className="flex items-center justify-between border-b border-black/[0.08] pb-4">
         <div>
-          <div className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider">
-            Spatio-Temporal Analysis
-          </div>
-          <h3 className="text-base font-normal text-[#ededf3] mt-0.5">
+          <h3 className="text-lg font-semibold text-[#292827] tracking-tight">
             Epidemiological reasoning
           </h3>
+          <p className="text-xs text-[#73736e] mt-0.5">
+            {isDay1Baseline 
+              ? 'Phase 1 Flood Inundation & Sewage Breach Vector Tracking' 
+              : 'Causal linkage: Floodwater breach & OTC medication rushes'}
+          </p>
         </div>
 
         <div className="text-right">
-          <span className={`px-3 py-1 rounded-full text-xs font-mono font-medium ${
-            isCritical ? 'bg-[#fc92b4]/20 text-[#fc92b4]' : 'bg-[#5266eb]/20 text-[#9bb4e6]'
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            isDay1Baseline 
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+              : (isCritical ? 'bg-rose-100 text-rose-800' : 'bg-[#d4c7ff]/50 text-[#1b1938]')
           }`}>
-            Risk: {Math.round(alert.risk_probability * 100)}%
+            {isDay1Baseline 
+              ? 'Risk: 18% Low — Early Incubation' 
+              : `Risk: ${Math.round((alert?.risk_probability || 0.93) * 100)}% Critical`}
           </span>
         </div>
       </div>
 
-      {/* Pathogen & Deduction in Humanist Text */}
+      {/* Pathogen & Deduction */}
       <div className="space-y-3">
-        <div className="p-4 rounded-xl bg-[#272735] border border-[rgba(175,180,205,0.15)] space-y-1.5">
-          <div className="text-[11px] font-light text-[#afb4cd] uppercase tracking-wider">
-            Suspected Pathogen Class
+        <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-xs space-y-1">
+          <div className="text-[11px] font-semibold text-[#73736e] uppercase tracking-wider">
+            {isDay1Baseline ? 'Surveillance Phase Classification' : 'Suspected Pathogen Class'}
           </div>
-          <div className="text-sm font-medium text-[#ededf3]">
-            {alert.suspected_pathogen_class || 'Vibrio Cholerae / Acute Enteric Outbreak'}
+          <div className="text-sm font-semibold text-[#292827]">
+            {isDay1Baseline 
+              ? 'Early Latent Contamination Phase (Pre-symptomatic incubation)' 
+              : (alert?.suspected_pathogen_class || 'Waterborne Enteric (Vibrio cholerae / Acute Epidemic Gastroenteritis)')}
           </div>
         </div>
 
-        <p className="text-xs text-[#c3c3cc] font-light leading-relaxed">
-          {alert.causal_chain_reasoning}
+        {/* Dynamic Reasoning Paragraph - 100% Consistent with Bottom Stat Cards */}
+        <p className="text-xs text-[#292827] font-normal leading-relaxed bg-[#f7f5f2] p-4 rounded-xl border border-black/[0.04]">
+          {dynamicReasoningParagraph}
         </p>
       </div>
 
-      {/* Human-in-the-Loop Action Orders */}
-      <div className="space-y-3 pt-2">
-        <div className="text-xs font-light text-[#afb4cd] uppercase tracking-wider">
-          Proposed Containment Actions
+      {/* Containment Action Orders */}
+      <div className="space-y-3 pt-1">
+        <div className="text-xs font-semibold text-[#73736e] uppercase tracking-wider">
+          {isDay1Baseline ? 'Active Disaster Mitigation Actions' : 'Proposed Containment Actions'}
         </div>
 
         <div className="space-y-3">
-          {(alert.action_proposals || []).map((action) => {
+          {actionsList.map((action) => {
             const isApproved = action.status === 'APPROVED';
+            const displayTitle = (action.title || '').replace(/Ward 14/gi, 'Affected Low-Lying Sectors');
+            const displayTargetArea = (action.target_area || '').replace(/Ward 14/gi, 'Affected Low-Lying Sectors');
 
             return (
               <div 
                 key={action.action_id}
-                className="p-4 rounded-xl bg-[#272735] border border-[rgba(175,180,205,0.15)] space-y-3"
+                className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-xs space-y-3 transition-all"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-xs font-light text-[#afb4cd]">
+                    <div className="text-xs text-[#73736e]">
                       {ACTION_TYPE_LABELS[action.action_type] || action.action_type}
                     </div>
-                    <div className="text-sm font-medium text-[#ededf3] mt-0.5">
-                      {action.title}
+                    <div className="text-sm font-semibold text-[#292827] mt-0.5">
+                      {displayTitle}
                     </div>
                   </div>
 
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono shrink-0 ${
+                  <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-semibold shrink-0 ${
                     isApproved 
-                      ? 'bg-[#5266eb]/20 text-[#9bb4e6]' 
-                      : 'bg-[#fc92b4]/20 text-[#fc92b4]'
+                      ? 'bg-emerald-50 text-[#027e6f]' 
+                      : 'bg-[#d4c7ff]/40 text-[#1b1938]'
                   }`}>
                     {isApproved ? 'Approved' : 'Pending Authorization'}
                   </span>
                 </div>
 
-                <div className="text-xs text-[#c3c3cc] font-light flex items-center justify-between">
-                  <span>Target Area: <strong className="text-[#ededf3] font-normal">{action.target_area}</strong></span>
+                <div className="text-xs text-[#73736e] flex items-center justify-between">
+                  <span>Target Area: <strong className="text-[#292827] font-medium">{displayTargetArea}</strong></span>
                 </div>
 
                 {!isApproved ? (
@@ -131,20 +195,23 @@ export default function EpidemicReasoningCard({
                     type="button"
                     onClick={() => handleApprove(action.action_id)}
                     disabled={approvingActionId === action.action_id}
-                    className="w-full mercury-btn-primary h-9 text-xs"
+                    className="w-full superhuman-btn-primary !h-10 text-xs !opacity-100 hover:!opacity-95"
+                    style={{
+                      background: '#1b1938',
+                      color: '#ffffff',
+                      opacity: 1
+                    }}
                   >
-                    {approvingActionId === action.action_id ? (
-                      <span>Authorizing order...</span>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Authorize & Dispatch Order</span>
-                      </>
-                    )}
+                    <span className="text-white font-medium">
+                      {approvingActionId === action.action_id ? 'Authorizing order...' : 'Authorize & Dispatch Order'}
+                    </span>
+                    <span className="superhuman-arrow-chip !p-1">
+                      <ArrowRight className="w-3 h-3 text-white" />
+                    </span>
                   </button>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs text-[#9bb4e6] font-light pt-1">
-                    <CheckCircle className="w-4 h-4 text-[#5266eb]" />
+                  <div className="flex items-center gap-2 text-xs text-[#027e6f] font-medium pt-1">
+                    <CheckCircle className="w-4 h-4 text-[#027e6f]" />
                     <span>Order signed by {action.approved_by || 'CMHO'}</span>
                   </div>
                 )}
