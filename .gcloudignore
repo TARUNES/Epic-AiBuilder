@@ -1,0 +1,16 @@
+.gcloudignore
+.git
+.gitignore
+.dockerignore
+node_modules/
+**/node_modules/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+frontend/dist/
+dist/
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
