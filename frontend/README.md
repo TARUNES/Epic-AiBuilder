@@ -1,16 +1,28 @@
-# React + Vite
+# EPIC-Hour Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite frontend application for EPIC-Hour (Epidemic Prediction & Immediate Crisis Hour).
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The frontend provides three crisis response portals:
+- **Citizen SOS Portal (`CitizenSOSPortal.jsx`):** Zero-login emergency reporting with voice recording, live speech transcription, and automated triage status.
+- **Clinic & Pharmacy Pulse Portal (`PharmacyPulsePortal.jsx`):** Syndromic telemetry ingestion, OTC medication rush tracking, and clinical dictation.
+- **Municipal Command Center (`CommandCenter.jsx`):** Interactive tactical map, timeline switching between Wave 1 (Day 1 Acute Rescue) and Wave 2 (Day 5 Post-Flood Epidemic Surveillance), and one-click municipal action approvals.
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Install Dependencies
+```bash
+npm install
+```
 
-## Expanding the Oxlint configuration
+### Development Server
+```bash
+npm run dev
+```
+Default local port: `http://localhost:5173`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### Production Build
+```bash
+npm run build
+```
