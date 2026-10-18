@@ -7,6 +7,8 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -68,8 +70,27 @@ def hash_phone(phone: Optional[str]) -> Optional[str]:
     cleaned = "".join(filter(str.isdigit, phone))
     return hashlib.sha256(cleaned.encode("utf-8")).hexdigest()
 
+# Static frontend directory for Cloud Run container or local dist preview
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "dist")
+if not os.path.exists(STATIC_DIR):
+    STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "dist")
+
 @app.get("/")
 def read_root():
+    if os.path.exists(STATIC_DIR) and os.path.exists(os.path.join(STATIC_DIR, "index.html")):
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+    return {
+        "service": "EPIC-Hour Crisis Lifecycle Platform",
+        "version": "1.0.0",
+        "track": "Google AI Builder Cup - Sustainability & Social Impact",
+        "docs": "/docs",
+        "health": "/health",
+        "mock_mode": os.environ.get("MOCK_MODE", "false"),
+        "gemini_active": bool(os.environ.get("GEMINI_API_KEY")),
+    }
+
+@app.get("/api/info")
+def read_api_info():
     return {
         "service": "EPIC-Hour Crisis Lifecycle Platform",
         "version": "1.0.0",
@@ -473,8 +494,30 @@ def approve_action(req: ActionApprovalRequest):
         "message": f"Action '{action.title}' approved by {req.approver_name}. Municipal protocol triggered."
     }
 
+# Mount static assets and SPA fallback for production Cloud Run deployment
+if os.path.exists(STATIC_DIR):
+    assets_dir = os.path.join(STATIC_DIR, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa_fallback(full_path: str):
+        # Prevent capturing API, docs, or health endpoints
+        if full_path.startswith("api/") or full_path in ("health", "docs", "openapi.json", "redoc"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        
+        target_path = os.path.join(STATIC_DIR, full_path)
+        if full_path and os.path.exists(target_path) and os.path.isfile(target_path):
+            return FileResponse(target_path)
+        
+        index_file = os.path.join(STATIC_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Frontend build not found")
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
     host = os.environ.get("HOST", "0.0.0.0")
-    uvicorn.run("main:app", host=host, port=port, reload=True)
+    is_prod = os.environ.get("ENVIRONMENT", "development").lower() == "production"
+    uvicorn.run("main:app", host=host, port=port, reload=not is_prod)
