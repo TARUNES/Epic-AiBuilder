@@ -43,7 +43,8 @@ export default function EpicHourMap({
   tickets = [],
   facilities = [],
   volunteers = [],
-  pulses = []
+  pulses = [],
+  onSelectTicket = null
 }) {
   // Layer toggles
   const [showHazards, setShowHazards] = useState(phase === 2);

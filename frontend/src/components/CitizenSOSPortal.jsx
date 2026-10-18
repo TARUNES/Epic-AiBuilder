@@ -130,7 +130,7 @@ export default function CitizenSOSPortal({ onTicketCreated }) {
               }}
             >
               <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-              <span>Regional Emergency Response Network</span>
+              <span>Emergency Response · Velachery</span>
             </span>
 
             <span
@@ -165,7 +165,7 @@ export default function CitizenSOSPortal({ onTicketCreated }) {
               <div className="flex items-center gap-2">
                 <Radio className="w-4 h-4 text-[#027e6f] animate-pulse" />
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#1b1938]">
-                  Live Dispatch Telemetry
+                  Live Rescue Status
                 </span>
               </div>
               <span className="text-xs font-semibold text-[#027e6f] bg-emerald-50 px-2 py-0.5 rounded-md">
@@ -343,7 +343,7 @@ export default function CitizenSOSPortal({ onTicketCreated }) {
           {/* Quick Presets for Demo Testing */}
           <div className="pt-4 border-t border-black/[0.06] space-y-2">
             <div className="text-[11px] font-semibold text-[#73736e] text-center">
-              Or test an authentic Chennai flood scenario:
+              Quick emergency templates:
             </div>
             <div className="flex flex-wrap gap-2 justify-center">
               {QUICK_PRESETS.map((p, i) => (

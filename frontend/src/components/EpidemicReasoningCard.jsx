@@ -35,7 +35,6 @@ const DAY_1_PREVENTIVE_ACTIONS = [
 
 export default function EpidemicReasoningCard({ 
   alert, 
-  simulatedDay = 1,
   isWave2 = false,
   totalBioHazardCount = 5,
   activeClinicCount = 5,
@@ -45,7 +44,7 @@ export default function EpidemicReasoningCard({
 }) {
   const [approvingActionId, setApprovingActionId] = useState(null);
 
-  const isDay1Baseline = simulatedDay === 1 && !isWave2;
+  const isDay1Baseline = !isWave2;
   const isCritical = !isDay1Baseline && (alert ? alert.risk_probability >= 0.8 : true);
 
   const handleApprove = async (actionId) => {
@@ -66,41 +65,16 @@ export default function EpidemicReasoningCard({
     }
   };
 
-  // Single source of truth dynamically constructed reasoning paragraph
+  // Consumer-friendly clear explanation of current situation
   const dynamicReasoningParagraph = isDay1Baseline
-    ? `Floodwaters active; monitoring sewage breach anchors for post-flood incubation. ${totalBioHazardCount} bio-hazard anchors identified during acute rescue phase. OTC pharmacy syndromic velocity remains at baseline (${totalPresentingPatients} baseline patients, 0% surge).`
-    : `${totalBioHazardCount} distinct sewage breach and contaminated water disaster tickets logged during Phase 1 are directly upstream of ${activeClinicCount} reporting pharmacies exhibiting a ${surgePercent}% surge in ORS, Doxycycline, and rehydration requests (${totalPresentingPatients} presenting patients). Stagnant water and elevated ambient humidity have accelerated bacterial transmission in the municipal pipe network.`;
+    ? (totalBioHazardCount > 0 
+        ? `Floodwaters are active. Rescue teams have logged ${totalBioHazardCount} flooded hazard points. Clinic patient counts currently remain at baseline (${totalPresentingPatients} patients visiting across ${activeClinicCount} clinics).`
+        : `Monitoring active response network. No flood contamination incidents or patient surges reported yet.`)
+    : (totalPresentingPatients > 0
+        ? `${totalBioHazardCount} sewage overflows and stagnant water areas identified during the flood are upstream of ${activeClinicCount} local clinics that have seen a ${surgePercent}% surge in patients needing ORS and antibiotics (${totalPresentingPatients} patients). Early water chlorination and supply restocks are required to prevent widespread illness.`
+        : `No illness outbreaks or medication spikes detected across reporting healthcare partners.`);
 
-  const actionsList = isDay1Baseline 
-    ? DAY_1_PREVENTIVE_ACTIONS 
-    : (alert?.action_proposals && alert.action_proposals.length > 0 
-        ? alert.action_proposals 
-        : [
-            {
-              action_id: 'ACT-01',
-              title: 'Emergency Superchlorination of Affected Low-Lying Sump Lines',
-              action_type: 'trigger_municipal_containment_protocol',
-              target_area: 'Low-Lying Inundated Residential Sectors',
-              status: 'PENDING_APPROVAL',
-              urgency: 'HIGH'
-            },
-            {
-              action_id: 'ACT-02',
-              title: 'Immediate ORS & Doxycycline Emergency Depot Restock',
-              action_type: 'restock_medical_inventory',
-              target_area: 'Regional Primary Health Centers & Key Pharmacies',
-              status: 'PENDING_APPROVAL',
-              urgency: 'CRITICAL'
-            },
-            {
-              action_id: 'ACT-03',
-              title: 'Mobile Potable Water Tanker Deployment (10 Units)',
-              action_type: 'dispatch_chlorination_tanker',
-              target_area: 'Inundated Community Sectors',
-              status: 'PENDING_APPROVAL',
-              urgency: 'HIGH'
-            }
-          ]);
+  const actionsList = alert?.action_proposals || [];
 
   return (
     <div className="superhuman-card p-6 space-y-6 text-[#292827]">
@@ -109,12 +83,12 @@ export default function EpidemicReasoningCard({
       <div className="flex items-center justify-between border-b border-black/[0.08] pb-4">
         <div>
           <h3 className="text-lg font-semibold text-[#292827] tracking-tight">
-            Epidemiological reasoning
+            Health Alert
           </h3>
           <p className="text-xs text-[#73736e] mt-0.5">
             {isDay1Baseline 
-              ? 'Phase 1 Flood Inundation & Sewage Breach Vector Tracking' 
-              : 'Causal linkage: Floodwater breach & OTC medication rushes'}
+              ? 'Tracking flood-linked health risks' 
+              : 'Pattern found across nearby clinics'}
           </p>
         </div>
 
@@ -135,12 +109,12 @@ export default function EpidemicReasoningCard({
       <div className="space-y-3">
         <div className="p-4 rounded-xl bg-white border border-black/[0.06] shadow-xs space-y-1">
           <div className="text-[11px] font-semibold text-[#73736e] uppercase tracking-wider">
-            {isDay1Baseline ? 'Surveillance Phase Classification' : 'Suspected Pathogen Class'}
+            {isDay1Baseline ? 'Current Situation' : 'What we found'}
           </div>
           <div className="text-sm font-semibold text-[#292827]">
             {isDay1Baseline 
-              ? 'Early Latent Contamination Phase (Pre-symptomatic incubation)' 
-              : (alert?.suspected_pathogen_class || 'Waterborne Enteric (Vibrio cholerae / Acute Epidemic Gastroenteritis)')}
+              ? 'Floodwaters active — monitoring for waterborne illness outbreaks' 
+              : (alert?.suspected_pathogen_class || 'Waterborne illness spike — Diarrhea, vomiting, dehydration')}
           </div>
         </div>
 
@@ -153,11 +127,16 @@ export default function EpidemicReasoningCard({
       {/* Containment Action Orders */}
       <div className="space-y-3 pt-1">
         <div className="text-xs font-semibold text-[#73736e] uppercase tracking-wider">
-          {isDay1Baseline ? 'Active Disaster Mitigation Actions' : 'Proposed Containment Actions'}
+          {isDay1Baseline ? 'Actions taken' : 'Recommended actions'}
         </div>
 
         <div className="space-y-3">
-          {actionsList.map((action) => {
+          {actionsList.length === 0 ? (
+            <div className="p-4 rounded-xl bg-white border border-black/[0.06] text-xs text-[#73736e] text-center">
+              No pending containment actions. System operating under normal protocols.
+            </div>
+          ) : (
+            actionsList.map((action) => {
             const isApproved = action.status === 'APPROVED';
             const displayTitle = (action.title || '').replace(/Ward 14/gi, 'Affected Low-Lying Sectors');
             const displayTargetArea = (action.target_area || '').replace(/Ward 14/gi, 'Affected Low-Lying Sectors');
@@ -217,7 +196,8 @@ export default function EpidemicReasoningCard({
                 )}
               </div>
             );
-          })}
+          })
+        )}
         </div>
       </div>
 

@@ -27,11 +27,10 @@ export default function CommandCenter({
   onWaveChange,
   currentPhase = 1,
   onPhaseChange,
-  simulatedDay = 1,
-  onSimulateDay,
-  isSimulating,
   systemState,
+  isLoadingState = false,
   onActionApproved,
+  onRefresh,
 }) {
   const [selectedZone, setSelectedZone] = useState('ALL');
 
@@ -39,7 +38,6 @@ export default function CommandCenter({
   const isWave2 = activeWave === 'wave2' || activeWave === 2 || currentPhase === 2;
   const phaseNum = isWave2 ? 2 : 1;
 
-  // Fully synchronized Wave 1 / Wave 2 <-> Day 1 / Day 5 state transitions
   const handleSelectWave = (wave) => {
     const isW2 = wave === 'wave2' || wave === 2;
     if (onWaveChange) {
@@ -47,23 +45,9 @@ export default function CommandCenter({
     } else if (onPhaseChange) {
       onPhaseChange(isW2 ? 2 : 1);
     }
-    // Wave 2 tab click automatically sets timeline to Day 5; Wave 1 tab click sets timeline to Day 1
-    if (onSimulateDay) {
-      onSimulateDay(isW2 ? 5 : 1);
-    }
   };
 
-  const handleSelectDay = (day) => {
-    if (onSimulateDay) {
-      onSimulateDay(day);
-    }
-    // Day 1 click switches to Wave 1; Day 5 click switches to Wave 2
-    if (onWaveChange) {
-      onWaveChange(day >= 5 ? 'wave2' : 'wave1');
-    } else if (onPhaseChange) {
-      onPhaseChange(day >= 5 ? 2 : 1);
-    }
-  };
+
 
   const tickets = systemState?.active_sos_tickets || [];
   const facilities = systemState?.verified_facilities || [];
@@ -71,27 +55,25 @@ export default function CommandCenter({
   const pulses = systemState?.pharmacy_pulses || [];
   const alert = systemState?.outbreak_alert;
 
-  // Single Source of Truth for all numbers across cards and reasoning
   const totalBioHazardCount = tickets.filter(
     (t) => (t.triage?.environmental_hazard_logged || t.environmental_hazard_logged || []).length > 0
-  ).length || 5;
+  ).length;
 
   const rawPatientsSum = pulses.reduce(
     (acc, p) => acc + (p.extracted_signals?.estimated_patient_count || p.estimated_patient_count || p.presenting_patients || 0),
     0
   );
 
-  const isDay1 = simulatedDay === 1;
-  const surgePercent = isDay1 ? 0 : 380;
-  const totalPresentingPatients = isDay1 ? 42 : (rawPatientsSum > 0 ? rawPatientsSum : 257);
-  const activeClinicCount = pulses.length > 0 ? pulses.length : (facilities.length > 0 ? facilities.length : 5);
-  const totalFacilityCount = facilities.length > 0 ? facilities.length : 5;
+  const surgePercent = isWave2 && rawPatientsSum > 0 ? 380 : 0;
+  const totalPresentingPatients = rawPatientsSum;
+  const activeClinicCount = pulses.length;
+  const totalFacilityCount = facilities.length;
 
   const criticalCount = tickets.filter(
     (t) => (t.triage?.urgency_score || 0) >= 9.0
-  ).length || 2;
+  ).length;
 
-  const availableVolunteers = volunteers.filter((v) => v.available).length || 4;
+  const availableVolunteers = volunteers.filter((v) => v.available).length;
 
   return (
     <div className="space-y-6 text-[#292827]">
@@ -134,43 +116,67 @@ export default function CommandCenter({
           </div>
         </div>
 
-        {/* Center: Clean Lavender Pill Toggle (Wave 1 vs Wave 2) */}
-        <div className="flex items-center bg-white p-1 rounded-xl border border-black/[0.06] shadow-xs text-xs self-start lg:self-center">
-          <button
-            type="button"
-            onClick={() => handleSelectWave('wave1')}
-            className={!isWave2 ? 'superhuman-pill-active shadow-xs' : 'superhuman-pill-inactive'}
-          >
-            <span>Wave 1: Flood Rescue</span>
-          </button>
+        {/* Center: Wave Toggle & Firestore Live Actions */}
+        <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
+          <div className="flex items-center bg-white p-1 rounded-xl border border-black/[0.06] shadow-xs text-xs">
+            <button
+              type="button"
+              onClick={() => handleSelectWave('wave1')}
+              className={!isWave2 ? 'superhuman-pill-active shadow-xs' : 'superhuman-pill-inactive'}
+            >
+              <span>Flood Rescue</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => handleSelectWave('wave2')}
-            className={isWave2 ? 'superhuman-pill-active shadow-xs' : 'superhuman-pill-inactive'}
-          >
-            <span>Wave 2: Outbreak Radar</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => handleSelectWave('wave2')}
+              className={isWave2 ? 'superhuman-pill-active shadow-xs' : 'superhuman-pill-inactive'}
+            >
+              <span>Health Alerts</span>
+            </button>
+          </div>
 
-        {/* Right: Day 1 / Day 5 Segmented Switch */}
-        <div className="flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-black/[0.06] shadow-xs text-xs self-start lg:self-center">
-          <button
-            type="button"
-            disabled={isSimulating}
-            onClick={() => handleSelectDay(1)}
-            className={simulatedDay === 1 ? 'superhuman-pill-active shadow-xs !py-1 !px-3' : 'superhuman-pill-inactive !py-1 !px-3'}
-          >
-            Day 1 (Acute Flood)
-          </button>
-          <button
-            type="button"
-            disabled={isSimulating}
-            onClick={() => handleSelectDay(5)}
-            className={simulatedDay === 5 ? 'superhuman-pill-active shadow-xs !py-1 !px-3' : 'superhuman-pill-inactive !py-1 !px-3'}
-          >
-            Day 5 (Post-Flood)
-          </button>
+          {/* Direct Cloud Firestore Controls (Commented Out)
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const { seedFirestoreWithInitialDisasterData } = await import('../lib/firebase');
+                  await seedFirestoreWithInitialDisasterData();
+                  if (onRefresh) await onRefresh();
+                  else window.location.reload();
+                } catch (err) {
+                  alert("Firestore write: " + err.message);
+                }
+              }}
+              className="px-3 py-1.5 rounded-xl bg-[#027e6f] hover:bg-[#027e6f]/90 text-white font-medium text-xs shadow-xs transition-all flex items-center gap-1.5"
+              title="Populates authentic disaster records directly into your Firebase Console"
+            >
+              <span>+ Seed Cloud Data</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                if (window.confirm("Wipe all disaster data from Cloud Firestore?")) {
+                  try {
+                    const { clearAllFirestoreData } = await import('../lib/firebase');
+                    await clearAllFirestoreData();
+                    if (onRefresh) await onRefresh();
+                    else window.location.reload();
+                  } catch (err) {
+                    alert("Firestore clear error: " + err.message);
+                  }
+                }
+              }}
+              className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-medium text-xs shadow-xs transition-all"
+              title="Wipes collections in Cloud Firestore to start 100% clean"
+            >
+              <span>Reset</span>
+            </button>
+          </div>
+          */}
         </div>
       </div>
 
@@ -198,7 +204,9 @@ export default function CommandCenter({
                   Active Emergency SOS
                 </span>
                 <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-2xl font-bold text-[#292827]">{tickets.length}</span>
+                  <span className="font-mono text-2xl font-bold text-[#292827]">
+                    {isLoadingState ? <span className="inline-block w-8 h-6 bg-black/10 rounded animate-pulse" /> : tickets.length}
+                  </span>
                   <span className="text-xs text-[#027e6f] font-medium">Live queue</span>
                 </div>
                 <span className="text-xs text-[#73736e] block">Citizen rescue tickets</span>
@@ -209,7 +217,9 @@ export default function CommandCenter({
                   P0 Life-Threatening
                 </span>
                 <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-2xl font-bold text-rose-600">{criticalCount}</span>
+                  <span className="font-mono text-2xl font-bold text-rose-600">
+                    {isLoadingState ? <span className="inline-block w-8 h-6 bg-rose-200 rounded animate-pulse" /> : criticalCount}
+                  </span>
                   <span className="text-xs text-rose-700 font-medium">Critical</span>
                 </div>
                 <span className="text-xs text-[#73736e] block">Score ≥ 9.0/10</span>
@@ -220,7 +230,9 @@ export default function CommandCenter({
                   Field Responders Ready
                 </span>
                 <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-2xl font-bold text-[#1b1938]">{availableVolunteers}</span>
+                  <span className="font-mono text-2xl font-bold text-[#1b1938]">
+                    {isLoadingState ? <span className="inline-block w-8 h-6 bg-black/10 rounded animate-pulse" /> : availableVolunteers}
+                  </span>
                   <span className="text-xs text-[#027e6f] font-medium">Deployed</span>
                 </div>
                 <span className="text-xs text-[#73736e] block">Boats & paramedics</span>
@@ -236,8 +248,8 @@ export default function CommandCenter({
                   <span className="font-mono text-2xl font-bold text-rose-600">
                     {totalPresentingPatients}
                   </span>
-                  <span className={`text-xs font-medium ${isDay1 ? 'text-[#027e6f]' : 'text-rose-700'}`}>
-                    {isDay1 ? '0% baseline' : `+${surgePercent}% surge`}
+                  <span className={`text-xs font-medium ${surgePercent === 0 ? 'text-[#027e6f]' : 'text-rose-700'}`}>
+                    {surgePercent === 0 ? '0% baseline' : `+${surgePercent}% surge`}
                   </span>
                 </div>
                 <span className="text-xs text-[#73736e] block">Across {activeClinicCount} reporting clinics</span>
@@ -245,7 +257,7 @@ export default function CommandCenter({
 
               <div className="superhuman-card p-4 space-y-1">
                 <span className="text-[11px] font-semibold text-[#73736e] uppercase tracking-wider block">
-                  Bio-Hazard Anchors
+                  Contamination Sites
                 </span>
                 <div className="flex items-baseline justify-between">
                   <span className="font-mono text-2xl font-bold text-[#b070c0]">
@@ -258,7 +270,7 @@ export default function CommandCenter({
 
               <div className="superhuman-card p-4 space-y-1">
                 <span className="text-[11px] font-semibold text-[#73736e] uppercase tracking-wider block">
-                  Surveillance Network
+                  Reporting Clinics
                 </span>
                 <div className="flex items-baseline justify-between">
                   <span className="font-mono text-2xl font-bold text-[#027e6f]">
@@ -274,54 +286,76 @@ export default function CommandCenter({
           {/* Active Incidents or Pharmacy Pulses Summary Table */}
           <div className="superhuman-card p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between border-b border-black/[0.06] pb-3">
-              <span className="text-xs font-semibold text-[#73736e] uppercase tracking-wider">
-                {!isWave2 ? 'Live Incident Dispatch Stream' : 'Pharmacy Syndromic Reporting Network'}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-[#73736e] uppercase tracking-wider">
+                  {!isWave2 ? 'Live Incident Stream' : 'Clinic Health Reports'}
+                </span>
+                {isLoadingState && (
+                  <span className="w-2 h-2 rounded-full bg-[#027e6f] animate-ping" />
+                )}
+              </div>
               <span className="text-xs text-[#027e6f] font-medium">
-                {!isWave2 ? `${tickets.length} Incidents Logged` : `${pulses.length} Active Feeds`}
+                {isLoadingState ? 'Connecting to Cloud Firestore...' : (!isWave2 ? `${tickets.length} Incidents Logged` : `${pulses.length} Active Feeds`)}
               </span>
             </div>
 
             <div className="divide-y divide-black/[0.04]">
-              {!isWave2 ? (
-                tickets.slice(0, 3).map((t) => (
-                  <div key={t.ticket_id} className="py-2.5 flex items-center justify-between text-xs">
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-[#292827]">#{t.ticket_id}</span>
-                        <span className="text-[#292827] font-medium truncate max-w-[200px] sm:max-w-xs">
-                          {t.location?.address}
+              {isLoadingState ? (
+                <div className="py-8 text-center text-xs text-[#73736e] space-y-2">
+                  <div className="w-5 h-5 border-2 border-[#027e6f] border-t-transparent rounded-full animate-spin mx-auto" />
+                  <span>Loading live documents from Cloud Firestore...</span>
+                </div>
+              ) : !isWave2 ? (
+                tickets.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-[#73736e]">
+                    No emergency rescue incidents reported yet in Cloud Firestore.
+                  </div>
+                ) : (
+                  tickets.slice(0, 5).map((t) => (
+                    <div key={t.ticket_id} className="py-2.5 flex items-center justify-between text-xs">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-[#292827]">#{t.ticket_id.slice(-6)}</span>
+                          <span className="text-[#292827] font-medium truncate max-w-[200px] sm:max-w-xs">
+                            {t.location?.address}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-[#73736e]">
+                          {CATEGORY_NAMES[t.triage?.category] || t.triage?.category || 'General SOS'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          (t.triage?.urgency_score || 0) >= 9.0 ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          Priority {t.triage?.urgency_score || '7.5'}
                         </span>
                       </div>
-                      <div className="text-[11px] text-[#73736e]">
-                        {CATEGORY_NAMES[t.triage?.category] || t.triage?.category}
-                      </div>
                     </div>
-                    <div className="text-right">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        t.triage?.urgency_score >= 9.0 ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        Priority {t.triage?.urgency_score}
-                      </span>
-                    </div>
-                  </div>
-                ))
+                  ))
+                )
               ) : (
-                pulses.slice(0, 3).map((p) => (
-                  <div key={p.pulse_id} className="py-2.5 flex items-center justify-between text-xs">
-                    <div className="space-y-0.5">
-                      <div className="font-semibold text-[#292827]">{p.facility_name}</div>
-                      <div className="text-[11px] text-[#73736e]">
-                        Spiking: {p.extracted_signals?.medications_spiking?.join(', ')}
+                pulses.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-[#73736e]">
+                    No clinic health reports submitted yet.
+                  </div>
+                ) : (
+                  pulses.slice(0, 5).map((p) => (
+                    <div key={p.pulse_id} className="py-2.5 flex items-center justify-between text-xs">
+                      <div className="space-y-0.5">
+                        <div className="font-semibold text-[#292827]">{p.facility_name}</div>
+                        <div className="text-[11px] text-[#73736e]">
+                          Spiking: {p.extracted_signals?.medications_spiking?.join(', ') || 'General Medicines'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">
+                          {p.extracted_signals?.estimated_patient_count || 0} patients
+                        </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold">
-                        {p.extracted_signals?.estimated_patient_count} patients
-                      </span>
-                    </div>
-                  </div>
-                ))
+                  ))
+                )
               )}
             </div>
           </div>
@@ -332,7 +366,6 @@ export default function CommandCenter({
         <div className="lg:col-span-5 space-y-4">
           <EpidemicReasoningCard
             alert={alert}
-            simulatedDay={simulatedDay}
             isWave2={isWave2}
             totalBioHazardCount={totalBioHazardCount}
             activeClinicCount={activeClinicCount}

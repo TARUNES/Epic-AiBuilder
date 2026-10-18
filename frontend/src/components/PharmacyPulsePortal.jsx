@@ -118,13 +118,13 @@ export default function PharmacyPulsePortal({ currentUser, onPulseSubmitted }) {
       <div className="text-center space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#027e6f]/10 text-[#027e6f] border border-[#027e6f]/20 shadow-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-[#027e6f] animate-pulse" />
-          <span>Regional Syndromic Surveillance Network</span>
+          <span>Community Clinic Network</span>
         </div>
         <h1 className="superhuman-headline !text-3xl sm:!text-4xl">
-          Clinic daily pulse
+          Clinic daily update
         </h1>
         <p className="text-sm text-[#73736e]">
-          Verified Community Health Partner · Report unusual medication rushes to trigger preventive water treatment before hospital beds overflow.
+          Verified Local Healthcare Partner · Share medication demand trends so local response teams can deploy water purification and medical supplies where needed.
         </p>
 
         {/* Facility / Zone Selector Dropdown */}
@@ -301,10 +301,10 @@ export default function PharmacyPulsePortal({ currentUser, onPulseSubmitted }) {
         <div className="superhuman-glass-card p-6 space-y-2 border-emerald-200 bg-emerald-50/70 animate-in fade-in duration-300">
           <div className="flex items-center gap-2 text-[#027e6f]">
             <CheckCircle className="w-5 h-5 text-[#027e6f]" />
-            <span className="text-base text-[#292827] font-semibold">Report received by municipal surveillance</span>
+            <span className="text-base text-[#292827] font-semibold">Update received by health authorities</span>
           </div>
           <p className="text-xs text-[#73736e]">
-            Pulse logged under facility <strong className="text-[#292827] font-mono">{facilityId}</strong>. Public health AI is correlating this signal against flood breach vectors.
+            Logged for <strong className="text-[#292827] font-mono">{facilityId}</strong>. Coordinated response teams and water treatment units have been alerted.
           </p>
         </div>
       )}

@@ -5,86 +5,88 @@ import CitizenSOSPortal from './components/CitizenSOSPortal';
 import PharmacyPulsePortal from './components/PharmacyPulsePortal';
 import CommandCenter from './components/CommandCenter';
 import { api } from './services/api';
+import { 
+  saveUserCredentials, 
+  clearUserCredentials, 
+  getUserCredentials,
+  subscribeToUserSession,
+  saveActiveWave,
+  subscribeToActiveWave 
+} from './lib/firebase';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => {
+  // Restore persistent session immediately on boot (no flash of logged-out state)
+  const initialSession = typeof window !== 'undefined' ? (function() {
     try {
-      const saved = localStorage.getItem('epic_user');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+      const s = localStorage.getItem('epic_user_session');
+      return s ? JSON.parse(s) : null;
+    } catch { return null; }
+  })() : null;
 
-  // Public users landing on app see Citizen SOS. If authenticated as MUNICIPAL, default to command. If PHARMACY, default to pharmacy.
-  const [currentRoute, setCurrentRoute] = useState(() => {
-    try {
-      const saved = localStorage.getItem('epic_user');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.role === 'MUNICIPAL') return 'command';
-        if (parsed.role === 'PHARMACY') return 'pharmacy';
-      }
-    } catch {}
-    return 'citizen';
-  });
+  const [currentUser, setCurrentUser] = useState(initialSession);
+  const [currentRoute, setCurrentRoute] = useState(
+    initialSession?.role === 'MUNICIPAL' ? 'command' : initialSession?.role === 'PHARMACY' ? 'pharmacy' : 'citizen'
+  );
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-  // Persistent Active Wave State (Decoupled from polling and synced with sessionStorage)
-  const [activeWave, setActiveWave] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem('epic_active_wave');
-      return saved === 'wave2' || saved === '2' ? 'wave2' : 'wave1';
-    } catch {
-      return 'wave1';
-    }
-  });
-
-  const [simulatedDay, setSimulatedDay] = useState(() => {
-    try {
-      const savedWave = sessionStorage.getItem('epic_active_wave');
-      return savedWave === 'wave2' || savedWave === '2' ? 5 : 1;
-    } catch {
-      return 1;
-    }
-  });
-
-  const [isSimulating, setIsSimulating] = useState(false);
-
-  // State Telemetry (silently and seamlessly loads local mock state if backend is offline)
+  const [activeWave, setActiveWave] = useState('wave1');
   const [systemState, setSystemState] = useState(null);
+  const [isLoadingState, setIsLoadingState] = useState(true);
+
+  // Subscribe to real-time User Session and Wave updates from Firebase
+  useEffect(() => {
+    const unsubscribeSession = subscribeToUserSession((firebaseUser) => {
+      if (firebaseUser) {
+        setCurrentUser(firebaseUser);
+        if (firebaseUser.role === 'MUNICIPAL') setCurrentRoute('command');
+        else if (firebaseUser.role === 'PHARMACY') setCurrentRoute('pharmacy');
+      } else {
+        const local = getUserCredentials();
+        if (!local) {
+          setCurrentUser(null);
+          setCurrentRoute('citizen');
+        }
+      }
+    });
+
+    const unsubscribeWave = subscribeToActiveWave((cloudWave) => {
+      if (cloudWave) setActiveWave(cloudWave);
+    });
+
+    return () => {
+      if (typeof unsubscribeSession === 'function') unsubscribeSession();
+      if (typeof unsubscribeWave === 'function') unsubscribeWave();
+    };
+  }, []);
 
   const handleWaveChange = (wave) => {
     const normalized = wave === 'wave2' || wave === 2 ? 'wave2' : 'wave1';
     setActiveWave(normalized);
-    const syncDay = normalized === 'wave2' ? 5 : 1;
-    setSimulatedDay(syncDay);
-    try {
-      sessionStorage.setItem('epic_active_wave', normalized);
-    } catch {}
+    saveActiveWave(normalized);
   };
 
-  const fetchState = useCallback(async () => {
+  const fetchState = useCallback(async (showLoading = false) => {
+    if (showLoading) setIsLoadingState(true);
     try {
       const data = await api.getState('WARD_14');
       if (data) {
         setSystemState(data);
-        // NOTE: We deliberately DO NOT overwrite activeWave here, fixing the snap-back bug!
       }
     } catch (err) {
       console.debug('State sync:', err);
+    } finally {
+      setIsLoadingState(false);
     }
   }, []);
 
   useEffect(() => {
     let isMounted = true;
     const init = async () => {
-      if (isMounted) await fetchState();
+      if (isMounted) await fetchState(true);
     };
     init();
     const interval = setInterval(() => {
-      if (isMounted) fetchState();
+      if (isMounted) fetchState(false);
     }, 6000);
     return () => {
       isMounted = false;
@@ -92,11 +94,9 @@ export default function App() {
     };
   }, [fetchState]);
 
-  const handleLoginSuccess = (authData) => {
+  const handleLoginSuccess = async (authData) => {
     setCurrentUser(authData);
-    try {
-      localStorage.setItem('epic_user', JSON.stringify(authData));
-    } catch {}
+    await saveUserCredentials(authData);
 
     if (authData.role === 'PHARMACY') {
       setCurrentRoute('pharmacy');
@@ -105,15 +105,13 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setCurrentUser(null);
-    try {
-      localStorage.removeItem('epic_user');
-    } catch {}
+    await clearUserCredentials();
     setCurrentRoute('citizen');
   };
 
-  const handleNavigate = (route) => {
+  const handleNavigate = async (route) => {
     if (route === 'command' && (!currentUser || currentUser.role !== 'MUNICIPAL')) {
       const demoCommander = {
         role: 'MUNICIPAL',
@@ -125,9 +123,7 @@ export default function App() {
         }
       };
       setCurrentUser(demoCommander);
-      try {
-        localStorage.setItem('epic_user', JSON.stringify(demoCommander));
-      } catch {}
+      await saveUserCredentials(demoCommander);
       setCurrentRoute('command');
       return;
     }
@@ -143,9 +139,7 @@ export default function App() {
         }
       };
       setCurrentUser(demoPharmacy);
-      try {
-        localStorage.setItem('epic_user', JSON.stringify(demoPharmacy));
-      } catch {}
+      await saveUserCredentials(demoPharmacy);
       setCurrentRoute('pharmacy');
       return;
     }
@@ -153,23 +147,7 @@ export default function App() {
     setCurrentRoute(route);
   };
 
-  const handleSimulateDay = async (day) => {
-    setIsSimulating(true);
-    try {
-      await api.simulateDay(day);
-      setSimulatedDay(day);
-      const newWave = day >= 5 ? 'wave2' : 'wave1';
-      setActiveWave(newWave);
-      try {
-        sessionStorage.setItem('epic_active_wave', newWave);
-      } catch {}
-      await fetchState();
-    } catch (err) {
-      console.error('Simulation failed:', err);
-    } finally {
-      setIsSimulating(false);
-    }
-  };
+
 
   const handleActionApproved = (approvedAction) => {
     setSystemState((prev) => {
@@ -204,8 +182,14 @@ export default function App() {
         
         {currentRoute === 'citizen' && (
           <CitizenSOSPortal
-            onTicketCreated={() => {
-              fetchState();
+            onTicketCreated={async (newTicket) => {
+              if (newTicket) {
+                setSystemState((prev) => ({
+                  ...prev,
+                  active_sos_tickets: [newTicket, ...(prev?.active_sos_tickets || [])]
+                }));
+              }
+              await fetchState();
             }}
           />
         )}
@@ -213,8 +197,14 @@ export default function App() {
         {currentRoute === 'pharmacy' && (
           <PharmacyPulsePortal
             currentUser={currentUser}
-            onPulseSubmitted={() => {
-              fetchState();
+            onPulseSubmitted={async (newPulse) => {
+              if (newPulse) {
+                setSystemState((prev) => ({
+                  ...prev,
+                  pharmacy_pulses: [newPulse, ...(prev?.pharmacy_pulses || [])]
+                }));
+              }
+              await fetchState();
             }}
           />
         )}
@@ -224,12 +214,10 @@ export default function App() {
             currentUser={currentUser}
             activeWave={activeWave}
             onWaveChange={handleWaveChange}
-            simulatedDay={simulatedDay}
-            onSimulateDay={handleSimulateDay}
-            isSimulating={isSimulating}
             systemState={systemState}
+            isLoadingState={isLoadingState}
             onActionApproved={handleActionApproved}
-            onRefresh={fetchState}
+            onRefresh={() => fetchState(true)}
           />
         )}
       </main>
