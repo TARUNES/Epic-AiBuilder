@@ -1,114 +1,123 @@
-# CLAUDE.md — EPIC-Hour
+# CLAUDE.md — EPIC-Hour Developer & Architecture Guide
 
-## Project Context
-EPIC-Hour (Epidemic Prediction & Immediate Crisis Hour) is a **two-phase crisis lifecycle web application** for the Google AI Builder Cup (Sustainability & Social Impact track). It connects real-time disaster SOS triage (Phase 1, Hours 0–48) with post-disaster epidemic early warning (Phase 2, Days 3–14) via a unified, multi-actor platform.
+## 1. Project Context & Mission
+**EPIC-Hour** (Epidemic Prediction & Immediate Crisis Hour) is a **two-phase crisis intelligence platform** developed for the **Google AI Builder Cup** (*Sustainability & Social Impact track*). 
 
----
-
-## Multi-Actor Role Architecture (3 Portals)
-
-To ensure authenticity, safety, and real-world usability, the application separates interactions into three distinct role-based portals accessible via a top-level Role Switcher:
-
-1. **Citizen Emergency SOS Portal (`CitizenSOSPortal.jsx`)**:
-   - Frictionless, zero-login emergency reporting for stranded citizens or bystanders.
-   - Supports vernacular Voice Recording (`MediaRecorder` base64 WAV/MP3) + Text input + 1-Click Demo Presets.
-   - Displays live Semantic De-duplication status ("Merged with nearby ticket — Urgency boosted"), assigned volunteer ETA, and basic safety guidance.
-
-2. **Verified Medical Shop & Healthcare Portal (`PharmacyPulsePortal.jsx`)**:
-   - Authenticated portal for neighborhood pharmacies (MedPlus, Apollo, Jan Aushadhi) and ASHA/clinic workers.
-   - Requires selecting a verified `facility_id` with a validated `license_token` badge to prevent fake data poisoning.
-   - **Hybrid Input**: Supports BOTH 10-second vernacular voice/text notes AND structured **1-Tap OTC Spike Steppers** (ORS Packets, Doxycycline, Paracetamol, Ciprofloxacin, IV Fluids) + Stockout toggles + Estimated patient count.
-   - Collects strictly aggregate syndromic/OTC velocity (zero patient PII).
-
-3. **Municipal Command Center (`CommandCenter.jsx`)**:
-   - Dark-mode geospatial operations dashboard for disaster and public health officers.
-   - Features `<TimeHorizonSlider />` (Phase 1 Acute Rescue ↔ Phase 2 Bio-Surveillance Radar), `<EpicHourMap />`, and `<EpidemicReasoningCard />` with Human-in-the-Loop approval buttons for Gemini Function Calls.
+The platform bridges the gap between two fatal phases of climate disasters:
+1. **Act 1 / Wave 1 (Hours 0–48 — Acute Rescue):** Multilingual citizen SOS triage, semantic deduplication of panicked distress calls, and autonomous volunteer boat dispatch.
+2. **Act 2 / Wave 2 (Days 3–14 — Post-Disaster Epidemics):** Outbreak early warning radar cross-referencing persisted Phase 1 sewage breach anchors with Phase 2 pharmacy over-the-counter (OTC) medication rushes and live weather telemetry.
 
 ---
 
-## Tech Stack Overview
+## 2. Multi-Actor Portal Architecture
 
-- **Frontend:** React 19 (Vite) + Tailwind CSS + `lucide-react` + `axios`
-- **Geospatial UI:** `@vis.gl/react-google-maps` + `deck.gl` (`ScatterplotLayer` & `HeatmapLayer`), with an automatic graceful fallback to an interactive SVG/Leaflet tactical map if `VITE_GOOGLE_MAPS_API_KEY` is missing.
-- **Backend:** Python 3.11 + FastAPI (async, Cloud Run ready)
+The platform separates crisis response into three distinct role-based portals:
+
+### 1. Citizen Emergency SOS Portal (`CitizenSOSPortal.jsx`)
+- **Audience:** Stranded citizens, families, or civilian bystanders.
+- **Access:** Zero-login, public landing portal.
+- **Audio & Speech Pipeline:**
+  - Simultaneously captures audio via `MediaRecorder` and live streams words into the textarea using `window.SpeechRecognition || window.webkitSpeechRecognition`.
+  - Generates an object URL (`URL.createObjectURL(blob)`) rendering a compact `<audio controls src={audioUrl} />` bar with duration counter and `Clear / Re-record` buttons.
+  - Automatically falls back to backend `POST /api/v1/audio/transcribe` (Gemini 2.5 Flash) if the browser lacks speech recognition.
+- **Display:** Immediate dispatch confirmation, assigned volunteer squad details (e.g., *Karthik Subramanian — Velachery Rapid Rescue*), live ETA, and safety advice.
+
+### 2. Verified Clinic & Pharmacy Pulse Portal (`PharmacyPulsePortal.jsx`)
+- **Audience:** Verified neighborhood pharmacies (MedPlus, Apollo, Jan Aushadhi) and ASHA/clinic health workers.
+- **Access:** Role-authenticated; validates `facility_id` and `license_token` to prevent telemetry poisoning.
+- **Syndromic Telemetry:**
+  - 1-Tap steppers for presenting patient counts.
+  - Instant stockout pills for frontline medications: **ORS Packets**, **Doxycycline**, **Paracetamol**.
+  - Clinical voice dictation with real-time speech transcription and audio review bar.
+- **Privacy Guarantee:** Collects exclusively aggregate OTC and syndromic velocity (zero patient PII).
+
+### 3. Municipal Command Center (`CommandCenter.jsx`)
+- **Audience:** Municipal disaster commissioners, public health officers (CMHO), and GCC relief commanders.
+- **Tactical Map (`EpicHourMap.jsx`):** Leaflet canvas with OpenStreetMap Standard tiles, plotting live rescue clusters, deployed boats, verified healthcare nodes, and persisted sewage breach points.
+- **Bidirectional Wave / Timeline Synchronization:**
+  - Clicking **Wave 1: Flood Rescue** automatically sets timeline to **Day 1 (Acute Flood)**.
+  - Clicking **Wave 2: Outbreak Radar** automatically sets timeline to **Day 5 (Post-Flood)**.
+  - Clicking **Day 1** automatically sets active wave to **Wave 1**.
+  - Clicking **Day 5** automatically sets active wave to **Wave 2**.
+- **Single Source of Truth Metric Engine:**
+  - Computes `totalBioHazardCount`, `totalPresentingPatients`, `activeClinicCount`, `totalFacilityCount`, and `surgePercent` once.
+  - Injects these exact values into both the bottom stat cards and the epidemiological reasoning paragraph, guaranteeing **zero mathematical contradictions**.
+- **Human-in-the-Loop Action Approval (`EpidemicReasoningCard.jsx`):** Renders Gemini 2.5 Pro causal reasoning and enables one-click authorization of municipal containment protocols (superchlorination, mobile potable water tankers, depot restocks).
+
+---
+
+## 3. Technology Stack & Design Tokens
+
+### Frontend
+- **Framework:** React 19 + Vite 8
+- **Styling:** Vanilla CSS design system with Tailwind CSS v4 tokens:
+- **Cartography:** Leaflet + `react-leaflet` with OpenStreetMap Standard default tiles.
+- **Icons:** `lucide-react`
+- **Linting:** `oxlint` (Must maintain 0 warnings, 0 errors)
+
+### Backend
+- **Framework:** Python 3.11 / 3.13 + FastAPI + Uvicorn
 - **AI Models (`google-genai` SDK):**
-  - `gemini-2.5-flash` — Multilingual SOS triage + Pharmacy OTC extraction (strict JSON `response_schema`)
-  - `text-embedding-004` (with fallback to `gemini-embedding-001` / local cosine vector) — 768-dim cosine similarity for SOS de-duplication
-  - `gemini-2.5-pro` — Spatio-temporal epidemic reasoning + Function Calling (`dispatch_volunteer_resource`, `trigger_municipal_containment_protocol`)
-- **Database:** Cloud Firestore (Native Mode) with automatic stateful in-memory fallback (`MOCK_MODE=true`) seeded from `backend/data/mock_dataset.json`.
-- **External APIs:** Google Maps Geocoding API, Open-Meteo API (humidity/rainfall, zero key).
+  - `gemini-2.5-flash`: Multimodal audio transcription, multilingual SOS triage, and pharmacy note extraction with strict Pydantic schemas.
+  - `text-embedding-004`: 768-dimensional semantic embeddings for cosine deduplication (< 300m Haversine distance threshold).
+  - `gemini-2.5-pro`: Spatio-temporal outbreak correlation, pathogen identification, and municipal action synthesis.
+- **Weather Telemetry:** Open-Meteo API (live ambient humidity and temperature).
+- **State Store:** Google Cloud Firestore (Native) with deterministic stateful in-memory fallback seeded from `backend/data/mock_dataset.json`.
 
 ---
 
-## Key Design & Safety Principles
+## 4. Key Architectural & Safety Principles
 
-1. **Hazard Persistence** — Phase 1 SOS messages tag `environmental_hazard_logged` (e.g., `SEWAGE_OVERFLOW`, `STAGNANT_FLOODWATER`). After rescue resolves, these nodes persist into Phase 2 as bio-risk anchors. Never discard disaster SOS hazard data.
-2. **Structured-First AI** — All Gemini calls use `response_mime_type="application/json"` + Pydantic `response_schema`.
-3. **Dedup Before Create** — Every new SOS ingest checks active tickets within 300m. If Cosine Similarity ≥ 0.85 AND Haversine distance < 300m → merge, increment `duplicate_count`, boost `urgency_score`, and do NOT create a duplicate pin.
-4. **Trust, Privacy & Clinical Safety** —
-   - Hash citizen phone numbers (SHA-256) and scrub personal names from public endpoints.
-   - Reject unverified pharmacy pulses missing a valid `facility_id` / `license_token`.
-   - Never generate individual patient medical prescriptions; only output municipal epidemiological containment protocols.
-5. **Resilient Dual-Mode Execution** — The app must never crash if an API key or Firestore credential is absent. Always provide clean fallbacks using `mock_dataset.json` so live demos are 100% bulletproof.
-
----
-
-## Project Structure
-
-```text
-epic-hour/
-├── frontend/src/
-│   ├── components/
-│   │   ├── RoleNavbar.jsx             # Switches: Citizen SOS | Pharmacy Portal | Command Center
-│   │   ├── CitizenSOSPortal.jsx       # Portal 1: Voice/Text SOS + Live Merge/Volunteer Status
-│   │   ├── PharmacyPulsePortal.jsx    # Portal 2: Verified Pharmacy OTC Steppers + Voice Log
-│   │   ├── CommandCenter.jsx          # Portal 3: Main Geospatial Ops Dashboard
-│   │   ├── TimeHorizonSlider.jsx      # Phase 1 (Hours 0-48) ↔ Phase 2 (Days 3-14)
-│   │   ├── EpicHourMap.jsx            # Google Maps + deck.gl pins/heatmap + fallback map
-│   │   └── EpidemicReasoningCard.jsx  # Causal chain + Function Calling action approvals
-│   ├── hooks/useMediaRecorder.js
-│   └── App.jsx
-│
-├── backend/
-│   ├── main.py                        # FastAPI app, CORS, all /api/v1/* endpoints
-│   ├── models/
-│   │   ├── sos_schema.py              # Pydantic: SOSTicket, TriageExtraction
-│   │   └── surveillance_schema.py     # PharmacyFacility, PharmacyPulse, OutbreakAlert
-│   ├── services/
-│   │   ├── state_store.py             # Firestore + stateful in-memory mock fallback
-│   │   ├── gemini_flash.py            # analyze_sos_message(), analyze_pharmacy_pulse()
-│   │   ├── gemini_pro.py              # correlate_outbreak() + tool declarations
-│   │   ├── embeddings.py              # get_embedding(), cosine_similarity(), find_duplicates()
-│   │   └── geocoding.py               # geocode_address() + Open-Meteo weather fetch
-│   └── data/mock_dataset.json         # Rich Ward 14 (Velachery) Day 1 & Day 5 dataset
-│
-└── infrastructure/
-    ├── Dockerfile
-    └── cloudbuild.yaml
-
-## API Contract (`/api/v1/`)
-
-| Method | Path | Request Body / Params | Description |
-|--------|------|-----------------------|-------------|
-| GET | `/state` | `?ward_id=WARD_14` | Returns active SOS tickets, verified pharmacies, pulses, weather, and latest outbreak alert |
-| POST | `/sos/ingest` | `{text?: str, audio_b64?: str, phone?: str, lat?: float, lng?: float, address?: str}` | Gemini Flash triage → PII hash → Geocode → Embedding dedup → Volunteer match |
-| GET | `/sos/active` | — | Returns all active Phase 1 SOS tickets |
-| GET | `/facilities/verified` | — | Returns list of verified pharmacies/clinics for Portal 2 |
-| POST | `/surveillance/pulse` | `{facility_id: str, license_token: str, text?: str, audio_b64?: str, otc_counts?: dict, stockouts?: list[str], estimated_patient_count?: int}` | Verifies pharmacy license → extracts/merges OTC spikes → triggers Gemini Pro outbreak correlation |
-| GET | `/surveillance/heatmap` | `?ward_id=WARD_14&phase=1\|2` | Returns GeoJSON FeatureCollection for map layers |
-| POST | `/demo/simulate-day` | `{day: 1 \| 5}` | Idempotent demo state loader for Day 1 (Acute Flood) or Day 5 (Outbreak Spike) |
-| POST | `/action/approve` | `{action_id: str, approver_name: str, notes?: str}` | Human-in-the-Loop approval for Gemini Pro MunicipalAction proposals |
+1. **Hazard Persistence Memory:**
+   - Environmental hazard tags (`SEWAGE_OVERFLOW`, `CONTAMINATED_WELL`, `STAGNANT_FLOODWATER`) captured during Phase 1 acute rescues are **never deleted**.
+   - When floodwaters recede, they become the upstream ground-truth anchors that Gemini 2.5 Pro correlates against Phase 2 pharmacy OTC surges.
+2. **Deterministic Dual-Mode Failover:**
+   - If `GEMINI_API_KEY` is present, live Google GenAI models execute all operations.
+   - If offline or unconfigured, local deterministic algorithms take over seamlessly, ensuring 100% demo uptime without crashes.
+3. **Data Privacy & PII Protection:**
+   - Citizen phone numbers are SHA-256 hashed before storage.
+   - Strict aggregate syndromic collection at pharmacies with zero patient PII.
+4. **Single Source of Truth:**
+   - Bottom stat cards and reasoning cards must always derive from the same active state arrays:
+     ```javascript
+     const totalBioHazardCount = tickets.filter(t => (t.triage?.environmental_hazard_logged || t.environmental_hazard_logged || []).length > 0).length;
+     const totalPresentingPatients = isDay1 ? 42 : (pulses.reduce((sum, p) => sum + (p.extracted_signals?.estimated_patient_count || p.estimated_patient_count || 0), 0) || 257);
+     ```
 
 ---
 
-## Running & Testing
+## 5. API Reference (`/api/v1/`)
+
+| Method | Endpoint | Payload / Parameters | Purpose |
+|---|---|---|---|
+| `GET` | `/state` | `?ward_id=WARD_14` | Retrieves system telemetry, tickets, pulses, weather, and outbreak alert. |
+| `POST` | `/sos/ingest` | `{text, audio_b64, audio_mime, address, phone}` | Citizen SOS triage, geocoding, 768-dim dedup, and rescue matching. |
+| `POST` | `/audio/transcribe` | `{audio_b64, audio_mime, context}` | Gemini 2.5 Flash multimodal vernacular speech-to-text. |
+| `GET` | `/sos/active` | — | Returns active citizen rescue queue. |
+| `GET` | `/facilities/verified` | — | Returns verified healthcare facilities. |
+| `POST` | `/surveillance/pulse` | `{facility_id, license_token, otc_counts, stockouts, estimated_patient_count, text, audio_b64}` | Ingests verified pharmacy syndromic pulse and triggers outbreak correlation. |
+| `GET` | `/surveillance/heatmap` | `?phase=1\|2&ward_id=WARD_14` | GeoJSON FeatureCollection of spatial pins and pulse clusters. |
+| `POST` | `/action/approve` | `{action_id, approver_name, notes}` | Human-in-the-Loop authorization of municipal containment orders. |
+| `POST` | `/auth/login` | `{role, identifier, password}` | RBAC login for Municipal Commanders and Verified Pharmacies. |
+| `POST` | `/demo/simulate-day` | `{day: 1 \| 5}` | Scenario toggle: Day 1 (Acute Flood) vs. Day 5 (Outbreak Surge). |
+
+---
+
+## 6. Development Commands
 
 ```bash
 # Backend (FastAPI on Port 8000)
 cd backend
+python -m pip install -r requirements.txt
 python -m uvicorn main:app --reload --port 8000
 
-# Frontend (Vite React 19 on Port 5173)
+# Frontend (Vite on Port 5173)
 cd frontend
+npm install
 npm run dev
+
+# Code Verification & Linting
+npm run lint          # Must output: 0 warnings, 0 errors
+npm run build         # Verifies production bundle build
+python -m compileall backend  # Verifies Python syntax across backend
 ```
